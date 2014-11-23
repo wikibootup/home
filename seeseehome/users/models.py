@@ -7,6 +7,7 @@ from django.db import OperationalError
 from seeseehome import msg
 
 class UserManager(BaseUserManager):
+##### CREATE
     def _create_user(self, username, email, 
                      password, **extra_fields):
         """
@@ -32,10 +33,11 @@ class UserManager(BaseUserManager):
     def validate_username(self, username):
         if not username:
             raise ValueError(msg.users_name_must_be_set)
-        
         elif len(username) > 30:
             raise ValidationError(msg.users_name_at_most_30)
-    
+
+        if bool(re.match('^[a-zA-Z0-9_-]+$', username)) is False:
+            raise ValidationError(msg.users_invalid_name)    
  
     def validate_password(self, password):
         if len(password) < 6:
@@ -55,11 +57,29 @@ class UserManager(BaseUserManager):
         
         if bool(re.search('[$&+,:;=?@#|\'\"<>.^*()%!-]', password)) is False:
             raise ValidationError(msg.users_pwd_no_special_char)
-        
+
+##########
+##### RETRIEVE
     def get_user(self, id):
         user = User.objects.get(id=id)
         return user
 
+##########
+##### UPDATE
+    def update_user(self, id, **extra_fields):
+        user = User.objects.get_user(id)
+        if 'username' in extra_fields:
+            self.validate_username(extra_fields['username'])
+            user.username = extra_fields['username']
+        else:
+            raise ValueError()
+        user.save(using = self._db)
+
+##########
+##### DELETE        
+    def delete_user(self, id):
+        user = User.objects.get(id=id)
+        user.delete()
 
 class User(AbstractBaseUser):
     objects = UserManager()
