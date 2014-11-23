@@ -1,3 +1,5 @@
 requirements*
 .env
-migrations/*
+migrations*
+*.pyc
+*sqlite*
