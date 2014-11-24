@@ -1,12 +1,13 @@
 {% extends "base.html" %}
-  {% block content %}
-    <h2>Sign up</h2>
-    <form method="POST">{% csrf_token %}
-      <input name="username" type="text" placeholder="Enter User Name" required>
-      <input name="email" type="text" placeholder="Enter Email" required>
-      <input name="pwd" type="password" placeholder="Enter Password" required>
-      <input name="confirm_pwd" type="password" placeholder="Confirm Your Password" required>
-      <input name="signup_submit" type="submit" value="Sign up">
-    </form>
-  {% endblock %}
+{% block content %}
+  <h2>Sign up</h2>
+  <form method="POST">{% csrf_token %}
+    <input name="username" type="text" placeholder="Enter User name" maxlength="30" class="basic_input" required>
+    <input name="email" type="text" placeholder="Enter Email" maxlength="64" class="basic_input" required>
+    <input name="pwd" type="password" placeholder="Enter Password" maxlength="255" class="basic_input" required>
+    <input name="confirm_pwd" type="password" placeholder="Confirm Your Password" maxlength="255" class="basic_input" required>
+    <input name="signup_submit" type="submit" value="Sign up">
+  </form>
+<a href="{% url 'home' %}">Main</a>
+{% endblock %}
 
