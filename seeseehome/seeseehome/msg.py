@@ -21,7 +21,6 @@ users_update_without_any_required_fields = \
 
 
 ### signup
-## signup
 users_signup_error = "ERROR : Sign Up"
 users_signup_success = "SUCCESS : Sign Up"
 users_signup_success_info = "You can login now"
@@ -36,5 +35,17 @@ users_invalid_pwd = \
     "password length is in range 6 ~ 255\n" + \
     "And it should contain numeric character, alphabet character," + \
     "and special character"
+users_confirm_pwd_error = \
+    "The two passwords are different. Please check password" 
+
+### login
+users_login_error = "ERROR : Login"
+users_login_success = "SUCCESS : Login"
+users_non_exist_email = "The email does not exist. Please check Email"
+users_login_success_info = "Successfully Login"
+users_deactivated = "Deactivated User"
+users_invalid = "Invalid email or password"
+users_invalid_password = "Invalid user password"
+
 
 
