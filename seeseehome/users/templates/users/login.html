@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+  {% block content %}
+    <h2>Log in</h2>
+    {% if next %}
+      <form action="/login/?next={{next}}" method="POST">{% csrf_token %}
+    {% else %}
+      <form method="POST">{% csrf_token %}
+        <input name="username" type="text" placeholder="Enter User Name" required>
+        <input name="pwd" type="password" placeholder="Enter Password" required>
+        <input type="hidden" name="next" value="{{ NEXT }}" />
+        <input name="login_submit" type="submit" value="Log in">
+      </form>
+    {% endif %}
+  {% endblock %}
+
