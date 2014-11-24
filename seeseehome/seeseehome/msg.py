@@ -47,5 +47,9 @@ users_deactivated = "Deactivated User"
 users_invalid = "Invalid email or password"
 users_invalid_password = "Invalid user password"
 
-
+## logout
+users_logout_error = "ERROR : Logout"
+users_logout_success = "SUCCESS : Logout"
+users_logout_error_info = "Logout failed"
+users_logout_success_info = "Successfully Logout"
 
