@@ -135,4 +135,4 @@ class UserManagerTestCase(TestCase):
                )
         user = User.objects.get_user(user.id)
         User.objects.delete_user(user.id)
-        self.assertRaises(ObjectDoesNotExist, User.objects.get_user, user.id)
+        self.assertEqual(None, User.objects.get_user(user.id))
