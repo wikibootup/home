@@ -61,9 +61,10 @@ class UserManager(BaseUserManager):
 ##########
 ##### RETRIEVE
     def get_user(self, id):
-        user = User.objects.get(id=id)
-        return user
-
+        try:
+            return User.objects.get(pk=id)
+        except User.DoesNotExist:
+            return None
 ##########
 ##### UPDATE
     def update_user(self, id, **extra_fields):
