@@ -6,17 +6,32 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib import messages
 from django.core.validators import validate_email
 from django.core.urlresolvers import reverse
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import login as _login, logout as _logout
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def logout(request):
+    _logout(request)
+    messages.success(request, msg.users_logout_success)
+    messages.info(request, msg.users_logout_success_info)
+    return reverse("home")
+
 
 # I couldn't solve built-in authenticate problem yet
-# So I use custom authenticate(But It is same as built-in authenticate)
+# So I use custom authenticate(But It is almost same as built-in authenticate)
+# It can authenticate username and email
 def authenticate(username=None, password=None):
     try:
         user = User.objects.get(username=username)
-        if user.check_password(password):
-            return user
     except User.DoesNotExist:
-        return None
+        try:
+            user = User.objects.get(email=username)
+        except User.DoesNotExist:
+            return None        
+    
+    if user.check_password(password):
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+        return user
 
 def delete_dicts(dicts):
     for dict_var in dicts:
@@ -29,18 +44,17 @@ def login(request):
         password = request.POST['pwd']
         user = authenticate(username = username, password = password)
         if user is not None:
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
             if user.is_active:
-                auth_login(request, user)
+                request.session['user_id'] = user.id
                 messages.success(request, msg.users_login_success)
                 messages.info(request, msg.users_login_success_info)
     
                 next = ""
                 if 'next' in request.GET:
                     next = request.GET['next']
-
-                if next == "":
-                    return HttpResponseRedirect(reverse("home"))
+                
+                if next == "" or next == "/":
+                    return render(request, "home.html", { 'user' : user },) 
                 else:
                     return HttpResponseRedirect(next)
         else:
