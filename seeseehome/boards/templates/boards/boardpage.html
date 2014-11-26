@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if boardposts %}
+    {% for boardpost in boardposts %}
+    <a href="{% url 'boards:postpage' board_id boardpost.post.id %}">{{ boardpost.post.subject }}</a><br>
+    {% endfor %}  
+  {% endif %}
+{% endblock %}
+
