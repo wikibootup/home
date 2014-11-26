@@ -39,6 +39,7 @@ INSTALLED_APPS = (
 
     # Django app
     'users',
+    'boards',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -86,3 +87,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_URL = "/login/"
+
+# If next isn't provided, it redirects to
+LOGIN_REDIRECT_URL = "/"
+
