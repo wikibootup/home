@@ -1,6 +1,4 @@
 ###### All apps
-
-
 #### users
 ### password
 users_pwd_at_least_6 = "user password length should be at least 6"
@@ -10,7 +8,7 @@ users_pwd_no_alphabet_char = "user password must contain alphabet character"
 users_pwd_no_special_char = "user password must contain special character"
 
 ### username
-users_name_must_be_set = "The given username must be set"
+users_name_must_be_set = "username must be set"
 users_name_at_most_30 = "user name length is limited to 30"
 users_invalid_name = "user name cannot contain special characters" + \
                     "except for under bar_ , hyphen -"
@@ -18,7 +16,6 @@ users_invalid_name = "user name cannot contain special characters" + \
 ### update user
 users_update_without_any_required_fields = \
     "possible update field : username, email"
-
 
 ### signup
 users_signup_error = "ERROR : Sign Up"
@@ -50,6 +47,28 @@ users_invalid_password = "Invalid user password"
 ## logout
 users_logout_error = "ERROR : Logout"
 users_logout_success = "SUCCESS : Logout"
-users_logout_error_info = "Logout failed"
+users_logout_error_info = \
+    "Logout failed. It seems you accessd the URL without Logged in"
 users_logout_success_info = "Successfully Logout"
+
+
+#### board
+### create board
+boards_max_number_of_boards = "Max number of boards : " + "10"
+boards_name_must_be_set = "board name must be set"
+boards_name_at_most_30 = "board name is limited to 30"
+
+### createpost
+### create post
+boards_post_subject_must_be_set = "subject must be set"
+boards_post_subject_at_most_255 = "subject is limited to 255"
+boards_post_content_must_be_set = "content must be set"
+boards_post_content_at_most_255 = "content is limited to 255"
+
+### create board posts
+boards_board_arg_error = \
+    "board argument must be Board object"
+boards_post_arg_error = \
+    "post argument must be Post object"
+
 
