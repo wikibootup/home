@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if boardlist %}
+    {% for board in boardlist %}
+    <a href="{% url 'boards:boardpage' board.id %}">{{ board.boardname }}</a><br>
+    {% endfor %}  
+  {% endif %}
+{% endblock %}
+
