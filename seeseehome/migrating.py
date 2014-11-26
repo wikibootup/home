@@ -16,6 +16,7 @@ def migrating_set():
             "manage.py",
             "makemigrations",
             "users",
+            "boards",
         ]
     )
 
