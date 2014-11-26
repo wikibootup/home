@@ -11,4 +11,7 @@ urlpatterns = patterns('',
 
     # users' urls
     url(r'^', include('users.urls', namespace='users')),
+
+    # boards' urls
+    url(r'^', include('boards.urls', namespace='boards')),
 )
