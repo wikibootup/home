@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html>
   <head>
+    {% load staticfiles %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script type="text/javascript" src="{% static 'js/jquery-2.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+    <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
   </head>
   <body>
     <style>
-      input {
-        text-align:center;
-      }
       .basic_input {
+        text-align:center;
         width:200px;
       }
 
     </style> 
+    <p>{{ user }}</p>
     {% block content %}
     {% endblock %}
     {% include 'message.html' %}
