@@ -28,7 +28,9 @@ class UserManager(BaseUserManager):
                                  **extra_fields)
 
     def create_superuser(self, username, email, password, **extra_fields):
-        return self._create_user(username, email, password, **extra_fields)
+        user = self._create_user(username, email, password, **extra_fields)
+        user.is_staff = True
+        return user
 
     def validate_username(self, username):
         if not username:
@@ -58,6 +60,17 @@ class UserManager(BaseUserManager):
         if bool(re.search('[$&+,:;=?@#|\'\"<>.^*()%!-]', password)) is False:
             raise ValidationError(msg.users_pwd_no_special_char)
 
+    def validate_userperm(self, userperm):
+        if userperm < 1:
+            raise ValidationError(
+                msg.users_userperm_at_least_1,
+            )
+        elif userperm > 31:
+            raise ValidationError(
+                msg.users_userperm_at_most_31,
+            )
+ 
+
 ##########
 ##### RETRIEVE
     def get_user(self, id):
@@ -72,8 +85,10 @@ class UserManager(BaseUserManager):
         if 'username' in extra_fields:
             self.validate_username(extra_fields['username'])
             user.username = extra_fields['username']
-        else:
-            raise ValueError()
+
+        if 'userperm' in extra_fields:
+            self.validate_userperm(extra_fields['userperm'])
+            user.userperm = extra_fields['userperm']
         user.save(using = self._db)
 
 ##########
@@ -107,6 +122,14 @@ class User(AbstractBaseUser):
     is_staff = models.BooleanField(
                    help_text = "Is the user can have access admin site?",
                    default=False
+               )
+    """
+    admission_year = 
+    """
+    userperm = models.IntegerField(
+                   help_text = "User permission ( user : 1, member : 2, "
+                   "coremember : 4, graduate : 8, president : 16, all : 31 )",
+                   default=msg.perm_user
                )
 
     def deactivate(self):
