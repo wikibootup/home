@@ -9,19 +9,6 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import login as _login, logout as _logout
 from django.contrib.auth.decorators import login_required
 
-def logout(request):
-    print (type(request.user))
-    print (request.user)
-
-    if request.user.__class__.__name__ is 'AnonymousUser':
-        messages.error(request, msg.users_logout_error)
-        messages.info(request, msg.users_logout_error_info)
-    else:
-        _logout(request)
-        messages.success(request, msg.users_logout_success)
-        messages.info(request, msg.users_logout_success_info)
-    return HttpResponseRedirect(reverse("home"))
-
 # I couldn't solve built-in authenticate problem yet
 # So I use custom authenticate(But It is almost same as built-in authenticate)
 # It can authenticate username and email
@@ -59,7 +46,7 @@ def login(request):
                     next = request.GET['next']
                 
                 if next == "" or next == "/":
-                    return render(request, "home.html")
+                    return HttpResponseRedirect(reverse("home"))
                 else:
                     return HttpResponseRedirect(next)
         else:
@@ -68,7 +55,18 @@ def login(request):
             return HttpResponseRedirect(reverse("users:login"))
  
     return render(request, "users/login.html")
- 
+
+def logout(request):
+    if request.user.__class__.__name__ is 'AnonymousUser':
+        messages.error(request, msg.users_logout_error)
+        messages.info(request, msg.users_logout_error_info)
+    else:
+        _logout(request)
+        messages.success(request, msg.users_logout_success)
+        messages.info(request, msg.users_logout_success_info)
+
+    return HttpResponseRedirect(reverse("home"))
+
 def signup(request):
     ### username
     if request.method == 'POST':
