@@ -1,5 +1,14 @@
 ###### All apps
 #### users
+### user permission level
+perm_anonymous = 0
+perm_user = 1
+perm_member = 2
+perm_coremember = 4
+perm_graduate = 8
+perm_president = 16
+perm_all = 31
+
 ### password
 users_pwd_at_least_6 = "user password length should be at least 6"
 users_pwd_at_most_255 = "user password max length is 255"
@@ -17,6 +26,10 @@ users_invalid_name = "user name cannot contain special characters" + \
 users_update_without_any_required_fields = \
     "possible update field : username, email"
 
+### userperm
+users_userperm_at_least_1 = "user permission sholud be at least 1"
+users_userperm_at_most_31 = "user permission should be at most 31"
+
 ### signup
 users_signup_error = "ERROR : Sign Up"
 users_signup_success = "SUCCESS : Sign Up"
@@ -25,7 +38,7 @@ users_exist_email = "The user email already exist"
 users_invalid_email = \
     "Invalid Email.\n" + \
     "It must have user part and domain part between '@'\n" + \
-    "Or It might contain invalid special character"
+    "Or It might contain invalid special character"   
 users_exist_name = "The user name already exist"
 users_invalid_pwd = \
     "Invalid password.\n" + \
@@ -58,12 +71,14 @@ boards_max_number_of_boards = "Max number of boards : " + "10"
 boards_name_must_be_set = "board name must be set"
 boards_name_at_most_30 = "board name is limited to 30"
 
+### get board
+boards_board_arg_does_not_exist = "This board argument does not exist"
+
 ### createpost
 ### create post
 boards_post_subject_must_be_set = "subject must be set"
 boards_post_subject_at_most_255 = "subject is limited to 255"
-boards_post_content_must_be_set = "content must be set"
-boards_post_content_at_most_255 = "content is limited to 255"
+boards_post_content_at_most_65535 = "content is limited to 63335"
 
 ### create board posts
 boards_board_arg_error = \
@@ -71,4 +86,10 @@ boards_board_arg_error = \
 boards_post_arg_error = \
     "post argument must be Post object"
 
-
+### write view
+boards_write_error = "ERROR : Write Error"
+boards_write_success = "SUCCESS : Write Success"
+boards_write_success_info = "You posted successfully"
+baords_anonymous_user_access = "Only login user must write a text"
+boards_access_perm = "You don't have the permission to access this board"
+boards_writer_perm_error = "You cannot write in this board ( pemission )"
