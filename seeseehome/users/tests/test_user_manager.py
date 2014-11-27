@@ -1,7 +1,7 @@
 from django.test import TestCase
 from users.models import User
 from django.core.exceptions import ObjectDoesNotExist,ValidationError
-from seeseehome import testdata
+from seeseehome import testdata, msg
 
 class UserManagerTestCase(TestCase):
     def setUp(self):
@@ -15,6 +15,22 @@ class UserManagerTestCase(TestCase):
                 password = testdata.users_valid_password,
             )
         )
+
+    def test_check_default_user_perm(self):
+        user = User.objects.create_superuser(
+                   username = testdata.users_valid_name,
+                   email = testdata.users_valid_email,
+                   password = testdata.users_valid_password,
+               )
+        self.assertEqual(user.userperm, msg.perm_user)
+
+    def test_create_superuser(self):
+        user = User.objects.create_superuser(
+                   username = testdata.users_valid_name,
+                   email = testdata.users_valid_email,
+                   password = testdata.users_valid_password,
+               )
+        self.assertTrue(user.is_staff)
 
     def test_get_user(self):
         user = User.objects.create_user(
@@ -113,7 +129,7 @@ class UserManagerTestCase(TestCase):
 
 ##########
 ##### UPDATE
-    def test_update_user_name(self):
+    def test_update_username(self):
         user = User.objects.create_user(
                    username = testdata.users_old_name,
                    email = testdata.users_valid_email,
@@ -124,6 +140,18 @@ class UserManagerTestCase(TestCase):
         updated_user = User.objects.get_user(user.id)
         self.assertEqual(updated_user.username, testdata.users_new_name)
  
+    def test_update_userperm(self):
+        user = User.objects.create_user(
+                   username = testdata.users_old_name,
+                   email = testdata.users_valid_email,
+                   password = testdata.users_valid_password,
+               )
+        self.assertEqual(user.userperm, msg.perm_user)
+        User.objects.update_user(user.id, userperm = msg.perm_president)
+        updated_user = User.objects.get_user(user.id)
+        self.assertEqual(updated_user.userperm, msg.perm_president)
+ 
+
 
 ##########
 ##### DELETE
