@@ -3,7 +3,9 @@
   {% if post %}
     writer : {{ post.writer }}<br>
     subject : {{ post.subject }}<br>
+    {% autoescape off %}
     content : {{ post.content }}<br>
+    {% endautoescape %}
   {% endif %}
 {% endblock %}
 
