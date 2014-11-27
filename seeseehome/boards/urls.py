@@ -5,5 +5,6 @@ urlpatterns = patterns('',
     url(r'^boards/([0-9]+)/$', 'boards.views.boardpage', name="boardpage"), 
     url(r'^boards/([0-9]+)/posts/([0-9]+)/$', 'boards.views.postpage', 
         name="postpage"),
+    url(r'^boards/([0-9]+)/posts/$', 'boards.views.write', name="write"),
 
 ) 
