@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
+  <a href="{% url 'boards:write' board_id %}">Write</a>
   {% if boardposts %}
     {% for boardpost in boardposts %}
-    <a href="{% url 'boards:postpage' board_id boardpost.post.id %}">{{ boardpost.post.subject }}</a><br>
+    <a href="{% url 'boards:postpage' board_id boardpost.post.id %}">{{ boardpost.post.subject }}</a> : {{ boardpost.post.writer.username }}<br>
     {% endfor %}  
   {% endif %}
 {% endblock %}
