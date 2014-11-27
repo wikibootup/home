@@ -5,6 +5,17 @@ from seeseehome import msg
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib import messages
 from django.core.urlresolvers import reverse
+from boards.forms import WriteForm
+
+def write(request, board_id):
+    form = WriteForm()
+    if request.method == 'POST':
+        subject = request.POST['subject']
+        if 'content' in request.POST:
+            content = request.POST['content']
+                
+
+    return render(request, "boards/write.html", {'form' : form})
 
 def postpage(request, board_id, post_id):
     board = Board.objects.get_board(board_id)
