@@ -9,9 +9,13 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', 'seeseehome.views.home', name='home'),
 
+    # for ckeditor 
+    url(r'^ckeditor/', include('ckeditor.urls')),
+
     # users' urls
     url(r'^', include('users.urls', namespace='users')),
 
     # boards' urls
     url(r'^', include('boards.urls', namespace='boards')),
+
 )
