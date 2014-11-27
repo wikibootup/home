@@ -1,3 +1,25 @@
-requirements*
-.env
-migrations/*
+# Migrations files
+migrations/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# No vi swapfile
+*.swp
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+bin/
+
+# Installer logs
+
+# Unit test / coverage reports
+
+# Database
+db.sqlite3
+.DS_store

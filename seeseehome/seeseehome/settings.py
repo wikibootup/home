@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -39,6 +39,10 @@ INSTALLED_APPS = (
 
     # Django app
     'users',
+    'boards',
+
+    # Python Package
+    'ckeditor',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -84,3 +88,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# This setting defines the additional locations
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'assets'),
+)
+
+LOGIN_URL = "/login/"
+# If next isn't provided, it redirects to
+LOGIN_REDIRECT_URL = "/"
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_JQUERY_URL = \
+    '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
+
+# specify the custom model as the default user model
+AUTH_USER_MODEL = 'users.User'

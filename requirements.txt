@@ -1,0 +1,13 @@
+Django==1.7.1
+Markdown==2.4.1
+PyYAML==3.11
+anyjson==0.3.3
+click==3.3
+django-ckeditor==4.4.6
+djangorestframework==2.4.0
+gnureadline==6.3.3
+ipython==2.1.0
+pep8==1.5.7
+pytz==2014.4
+six==1.7.3
+wsgiref==0.1.2
