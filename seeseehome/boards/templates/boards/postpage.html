@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
   {% if post %}
-    writer : {{ post.writer }}<br>
-    subject : {{ post.subject }}<br>
+
+    <hr>
+    <h2><font color="green">{{ post.subject }}</font></h1>
+    <hr>
+    {{ post.writer }}
+    <hr>
     {% autoescape off %}
-    content : {{ post.content }}<br>
+    {{ post.content }}<br>
     {% endautoescape %}
   {% endif %}
+  <hr>
+  <a href="{% url 'boards:rewrite' board.id post.id %}">Rewrite</a>
 {% endblock %}
 
