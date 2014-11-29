@@ -28,11 +28,13 @@ def write(request, board_id, **extra_fields):
         except ValueError:
             messages.error(request, msg.boards_write_error)
             messages.info(request, msg.boards_post_subject_must_be_set)
-            return HttpResponseRedirect(reverse("boards:write"))
+            return HttpResponseRedirect(reverse("boards:write", 
+                    args=(board_id)))
         except ValidationError:
             messages.error(request, msg.boards_write_error)
             messages.info(request, msg.boards_post_subject_at_most_255)
-            return HttpResponseRedirect(reverse("boards:write"))
+            return HttpResponseRedirect(reverse("boards:write",
+                    args=(board_id)))
 
 #       content
         if 'content' in request.POST:
@@ -42,7 +44,8 @@ def write(request, board_id, **extra_fields):
             except ValidationError:
                 messages.error(request, msg.boards_write_error)
                 messages.info(request, msg.boards_post_content_at_most_65535)
-                return HttpResponseRedirect(reverse("boards:write"))
+                return HttpResponseRedirect(reverse("boards:write",
+                        args=(board_id)))
             else:
                 is_valid_content = True
 
@@ -63,7 +66,8 @@ def write(request, board_id, **extra_fields):
         else:
             messages.error(request, msg.boards_write_error)
             messages.info(request, msg.boards_writer_perm_error)
-            return HttpResponseRedirect(reverse("boards:write"))
+            return HttpResponseRedirect(reverse("boards:write",
+                    args=(board_id)))
 
 #       post save
 #       If rewrite, no create, but update
@@ -88,17 +92,8 @@ def write(request, board_id, **extra_fields):
                                boardposts=boardposts, 
                                posts_per_page = 10
                            )
-        return render(request, "boards/boardpage.html", 
-               {
-                   'board_id' : board_id,
-                   'boardposts' : custom_paginator['boardposts'],
-                   'paginator' :custom_paginator['paginator'],
-                   'has_next' : custom_paginator['has_next'],
-                   'has_previous' : custom_paginator['has_previous'],
-                   'nextpage' : custom_paginator['nextpage'],
-                   'previous_page' : custom_paginator['previous_page'],
-               }
-           )
+        return HttpResponseRedirect(reverse("boards:boardpage",
+            args=(board_id, 1)))
 
     return render(request, "boards/write.html")
 
@@ -116,19 +111,8 @@ def rewrite(request, board_id, post_id):
                                boardposts=boardposts, 
                                posts_per_page = 10
                            )
-
-        return render(request, "boards/boardpage.html", 
-               {
-                   'board_id' : board_id,
-                   'boardposts' : custom_paginator['boardposts'],
-                   'paginator' :custom_paginator['paginator'],
-                   'has_next' : custom_paginator['has_next'],
-                   'has_previous' : custom_paginator['has_previous'],
-                   'nextpage' : custom_paginator['nextpage'],
-                   'previous_page' : custom_paginator['previous_page'],
-               }
-           )
-
+        return HttpResponseRedirect(reverse("boards:boardpage",
+            args=(board_id, 1)))
 
     return render(request, "boards/rewrite.html",
             {'board' : board, 'post' : post})
