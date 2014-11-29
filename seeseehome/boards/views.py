@@ -5,13 +5,15 @@ from seeseehome import msg
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from boards.forms import WriteForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+#from boards.forms import WriteForm
 
 @login_required
-def write(request, board_id):
-    form = WriteForm()
+def write(request, board_id, **extra_fields):
+#   django-ckform not used. 
+#   ckeditor widget class is used in template instead)
+#   form = WriteForm()
     if request.method == 'POST':
         is_valid_content = False
 
@@ -63,12 +65,18 @@ def write(request, board_id):
             return HttpResponseRedirect(reverse("boards:write"))
 
 #       post save
-        post = Post.objects.create_post(board=board, subject=subject, 
-                writer=writer)
-
+#       If rewrite, no create, but update
+        if not 'post_id' in extra_fields:
+            post = Post.objects.create_post(board=board, subject=subject, 
+                    writer=writer)
 #       content save
-        if is_valid_content:
-            Post.objects.update_post(post.id, content=content)
+            if is_valid_content:
+                Post.objects.update_post(post.id, content=content)
+        else:
+            post_id = extra_fields['post_id']
+            Post.objects.update_post(post_id, subject=subject)
+            if is_valid_content:
+                Post.objects.update_post(post_id, content=content)
 
         messages.success(request, msg.boards_write_success)
         messages.info(request, msg.boards_write_success_info)
@@ -77,7 +85,22 @@ def write(request, board_id):
         return render(request, "boards/boardpage.html", 
                 {'board_id' : board_id, 'boardposts' : boardposts})
 
-    return render(request, "boards/write.html", {'form' : form})
+    return render(request, "boards/write.html")
+
+#@login_required
+def rewrite(request, board_id, post_id):
+    board = Board.objects.get_board(board_id)
+    post = Post.objects.get_post(post_id) 
+    
+    if request.method == 'POST':
+        write(request, board_id, post_id=post.id)
+        boardposts = BoardPosts.objects.filter(board=board)
+        return render(request, "boards/boardpage.html", 
+                {'board_id' : board_id, 'boardposts' : boardposts})
+
+    return render(request, "boards/rewrite.html",
+            {'board' : board, 'post' : post})
+
 
 def postpage(request, board_id, post_id):
     board = Board.objects.get_board(board_id)
