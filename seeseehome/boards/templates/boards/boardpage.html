@@ -1,10 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-  <a href="{% url 'boards:write' board_id %}">Write</a>
+  <a href="{% url 'boards:write' board_id %}">Write</a><br>
   {% if boardposts %}
     {% for boardpost in boardposts %}
     <a href="{% url 'boards:postpage' board_id boardpost.post.id %}">{{ boardpost.post.subject }}</a> : {{ boardpost.post.writer.username }}<br>
     {% endfor %}  
-  {% endif %}
+    {% endif %}
+
+    {% if has_next %}
+      <a href="{% url 'boards:boardpage' board_id nextpage %}">Next</a><br>
+    {% endif %}
+    {% if has_previous %}
+      <a href="{% url 'boards:boardpage' board_id previous_page %}">Prev</a><br>
+    {% endif %}
+
 {% endblock %}
 

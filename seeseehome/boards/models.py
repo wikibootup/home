@@ -62,27 +62,60 @@ class Board(models.Model):
                     default = '',
                 )
 
+    readperm = models.IntegerField(
+                   help_text = "Read permission ( anonymous :0, user : 1, "
+                   "member : 2, coremember : 4, graduate : 8, "
+                   "president : 16, all : 31 )",
+                   default=msg.perm_all
+               )
+    writeperm = models.IntegerField(
+                    help_text = "Read permission ( anonymous :0, user : 1, "
+                    "member : 2, coremember : 4, graduate : 8, "
+                    "president : 16, all : 31 )",
+                    default=msg.perm_all
+                )
+
 class PostManager(models.Manager):
     ##### CREATE
-    def _create_post(self, board, writer, subject, content):
-        Board.objects.validate_boardname(board.boardname)
-        User.objects.validate_username(writer.username)
+    def _create_post(self, board, subject, writer, **extra_fields):
+        is_valid_content = False
+        is_valid_writer = False
+
+#       subject
         self.validate_subject(subject)
-        self.validate_content(content)
-        post = self.model(writer=writer, subject=subject,
-                content=content)        
+
+#       content
+        if 'content' in extra_fields:
+            content = extra_fields['content']
+            is_valid_content = self.validate_content(content)
+
+#       writer
+        is_valid_writer = self.is_valid_perm(
+                              boardperm = board.writeperm, 
+                              userperm = writer.userperm
+                          )
+        if not is_valid_writer:
+            raise ValidationError(msg.boards_writer_perm_error)
+
+#       post save ( caution : board is not parameter for post model )
+        post = self.model(subject=subject, writer=writer)
+        
+        if is_valid_content:
+            post.content = content
+
         post.save(using=self._db)
              
         # create a relationship between board & post
-        board_posts = BoardPosts.objects.create_board_posts(
+        boardposts = BoardPosts.objects.create_board_posts(
                              board = board,
                              post = post,
                          )
-        board_posts.save()
+        boardposts.save()
         return post
 
-    def create_post(self, board, writer, subject, content):
-        return self._create_post(board, writer, subject, content)
+    def create_post(self, board, subject, writer, **extra_fields):
+        return self._create_post(board=board, subject=subject, writer=writer,
+                **extra_fields)
     
     def validate_subject(self, subject):
         if not subject:
@@ -91,10 +124,13 @@ class PostManager(models.Manager):
             raise ValidationError(msg.boards_post_subject_at_most_255)
     
     def validate_content(self, content):
-        if not content:
-            raise ValueError(msg.boards_post_content_must_be_set)
-        elif len(content) > 65535:
+       if len(content) > 65535:
             raise ValidationError(msg.boards_post_content_at_most_255)
+       else:
+            return True
+
+    def is_valid_perm(self, boardperm, userperm):
+        return bool(boardperm & userperm)
 
     ##########
     ##### RETRIEVE
@@ -103,6 +139,17 @@ class PostManager(models.Manager):
             return Post.objects.get(pk=id)
         except Post.DoesNotExist:
             return None
+
+    ##########
+    ##### UPDATE
+    def update_post(self, post_id, **extra_fields):
+        post = Post.objects.get_post(post_id)
+        if 'subject' in extra_fields:
+            post.subject = extra_fields['subject']
+        if 'content' in extra_fields:
+            post.content = extra_fields['content']
+
+        post.save()
 
 class Post(models.Model):
     objects = PostManager()
@@ -118,8 +165,6 @@ class Post(models.Model):
                   max_length = 65535,
                   default = '',
               )
-    posted_date = models.DateField(db_index=True, auto_now_add=True)
-    
     
     posts = models.ManyToManyField(
                 Board,
@@ -161,3 +206,5 @@ class BoardPosts(models.Model):
                related_name="post_foreignkey",
             )    
 
+    posted_date = models.DateTimeField(db_index=True, auto_now_add=True)
+    
