@@ -106,11 +106,11 @@ class PostManager(models.Manager):
         post.save(using=self._db)
              
         # create a relationship between board & post
-        board_posts = BoardPosts.objects.create_board_posts(
+        boardposts = BoardPosts.objects.create_board_posts(
                              board = board,
                              post = post,
                          )
-        board_posts.save()
+        boardposts.save()
         return post
 
     def create_post(self, board, subject, writer, **extra_fields):
@@ -165,8 +165,6 @@ class Post(models.Model):
                   max_length = 65535,
                   default = '',
               )
-    posted_date = models.DateField(db_index=True, auto_now_add=True)
-    
     
     posts = models.ManyToManyField(
                 Board,
@@ -208,3 +206,5 @@ class BoardPosts(models.Model):
                related_name="post_foreignkey",
             )    
 
+    posted_date = models.DateTimeField(db_index=True, auto_now_add=True)
+    
