@@ -8,17 +8,18 @@ from seeseehome import msg
 
 class UserManager(BaseUserManager):
 ##### CREATE
-    def _create_user(self, username, email, 
-                     password, **extra_fields):
-        """
-        Creates and saves a User with the given username, email and password.
+    def _create_user(self, username, email, password, 
+        is_admin=False, **extra_fields):
+        """ 
+        It Creates and saves a User with the given username, email and 
+        password.
         """
         self.validate_username(username)
         email = self.normalize_email(email)
         validate_email(email)
         self.validate_password(password)
 
-        user = self.model(username=username, email=email, **extra_fields)
+        user = self.model(username=username, email=email, is_admin=is_admin)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -28,8 +29,8 @@ class UserManager(BaseUserManager):
                                  **extra_fields)
 
     def create_superuser(self, username, email, password, **extra_fields):
-        user = self._create_user(username, email, password, **extra_fields)
-        user.is_staff = True
+        user = self._create_user(username, email, password, 
+                is_admin=True, **extra_fields)
         return user
 
     def validate_username(self, username):
@@ -89,12 +90,21 @@ class UserManager(BaseUserManager):
         if 'userperm' in extra_fields:
             self.validate_userperm(extra_fields['userperm'])
             user.userperm = extra_fields['userperm']
+
+        if 'is_admin' in extra_fields:
+            is_admin = extra_fields['is_admin']
+            if type(is_admin) is bool:
+                user.is_admin = is_admin
+            else:
+                raise ValidationError(
+                        msg.users_update_is_admin_must_be_bool_type)
+
         user.save(using = self._db)
 
 ##########
 ##### DELETE        
     def delete_user(self, id):
-        user = User.objects.get(id=id)
+        user = self.get(id=id)
         user.delete()
 
 class User(AbstractBaseUser):
@@ -119,10 +129,15 @@ class User(AbstractBaseUser):
                     default=True
                 )
 
-    is_staff = models.BooleanField(
-                   help_text = "Is the user can have access admin site?",
-                   default=False
-               )
+    """
+    If you want your custom User model to also work with Admin, 
+    your User model must define some additional attributes and methods.
+    """
+    is_admin = models.BooleanField(
+                   help_text=('Is the user can access & edit admin page?'),
+                   default=False,
+                   )
+
     """
     admission_year = 
     """
@@ -134,9 +149,41 @@ class User(AbstractBaseUser):
 
     def deactivate(self):
         self.is_active = False
+        self.save()
         return self.is_active
 
     def activate(self):
         self.is_active = True
+        self.save()
         return self.is_active
+
+    @property
+    def is_staff(self):
+        "Is the user a member of staff?"
+        return self.is_admin
+
+    def get_full_name(self):
+        return self.username
+
+    def get_short_name(self):
+        return self.username
+
+    def get_all_permissions(self, obj=None):
+        if not self.is_active or self.is_anonymous() or obj is not None:
+            return set()
+        if not hasattr(self, '_perm_cache'):
+            self._perm_cache = self.get_user_permissions(self)
+            self._perm_cache.update(self.get_group_permissions(self))
+        return self._perm_cache
+
+    def has_module_perms(self, app_label):
+        """
+        Returns True if self has any permissions in the given app_label.
+        """
+        if not self.is_active:
+            return False
+        for perm in self.get_all_permissions(self):
+            if perm[:perm.index('.')] == app_label:
+                return True
+        return False
 
