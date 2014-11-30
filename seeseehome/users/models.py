@@ -27,12 +27,12 @@ class UserManager(BaseUserManager):
     def create_user(self, username, email, password, **extra_fields):
         return self._create_user(username, email, password, 
                                  **extra_fields)
-
+    
     def create_superuser(self, username, email, password, **extra_fields):
         user = self._create_user(username, email, password, 
                 is_admin=True, **extra_fields)
         return user
-
+    
     def validate_username(self, username):
         if not username:
             raise ValueError(msg.users_name_must_be_set)
@@ -109,8 +109,13 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     objects = UserManager()
+
+#   For custom user model, username field must be set   
     USERNAME_FIELD = 'username'
 
+#   When create superuser using cli, required field data is used.
+    REQUIRED_FIELDS = ['email']
+    
     username = models.CharField(
                help_text = "User name",
                max_length = 30,
@@ -138,12 +143,11 @@ class User(AbstractBaseUser):
                    default=False,
                    )
 
-    """
-    admission_year = 
-    """
     userperm = models.IntegerField(
-                   help_text = "User permission ( user : 1, member : 2, "
-                   "coremember : 4, graduate : 8, president : 16, all : 31 )",
+                   help_text = 'Available User Permission [ User, Member, '
+                    'Core member, Graduate, President ]',
+                   choices = ((1, 'User',), (2, 'Member'), (4, 'Core member'),
+                                (8, 'Graduate'), (16, 'President')),
                    default=msg.perm_user
                )
 
@@ -168,22 +172,17 @@ class User(AbstractBaseUser):
     def get_short_name(self):
         return self.username
 
-    def get_all_permissions(self, obj=None):
-        if not self.is_active or self.is_anonymous() or obj is not None:
-            return set()
-        if not hasattr(self, '_perm_cache'):
-            self._perm_cache = self.get_user_permissions(self)
-            self._perm_cache.update(self.get_group_permissions(self))
-        return self._perm_cache
+    """
+    The following two method 'has_perm', 'has_module_perms' is important to 
+    access built-in admin site.
+    """
+    def has_perm(self, perm, obj=None):
+        "Does the user have a specific permission?"
+        # Simplest possible answer: Yes, always
+        return True
 
     def has_module_perms(self, app_label):
-        """
-        Returns True if self has any permissions in the given app_label.
-        """
-        if not self.is_active:
-            return False
-        for perm in self.get_all_permissions(self):
-            if perm[:perm.index('.')] == app_label:
-                return True
-        return False
+        "Does the user have permissions to view the app `app_label`?"
+        # Simplest possible answer: Yes, always
+        return True
 
