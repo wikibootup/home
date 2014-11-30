@@ -10,6 +10,15 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
+# exception message handling
+# when we are attempt to save a naive datetime, warning occurs
+# During development, such warnings into ignore status
+import warnings
+warnings.filterwarnings(
+        'ignore', r"DateTimeField .* received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields')
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
@@ -37,11 +46,11 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Django app
+#   Custom apps
     'users',
     'boards',
 
-    # Python Package
+#   Python Packages
     'ckeditor',
 )
 
