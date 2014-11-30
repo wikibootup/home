@@ -1,3 +1,10 @@
 from django.contrib import admin
+from users.models import User
 
-# Register your models here.
+class UserAdmin(admin.ModelAdmin):
+    exclude = ('password', 'username', 'email', 
+                'last_login',)
+
+admin.site.register(User, UserAdmin)
+
+
