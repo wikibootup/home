@@ -33,6 +33,8 @@ users_invalid_name = "User name cannot contain special characters" + \
 ### update user
 users_update_without_any_required_fields = \
     "Possible update field : username, email"
+sers_update_is_admin_must_be_bool_type = \
+    "The type of is_admin argument is must be bool"
 
 ### userperm
 users_userperm_at_least_1 = "User permission sholud be at least 1"
