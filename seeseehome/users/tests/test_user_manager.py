@@ -147,9 +147,9 @@ class UserManagerTestCase(TestCase):
                    password = testdata.users_valid_password,
                )
         self.assertEqual(user.userperm, msg.perm_user)
-        User.objects.update_user(user.id, userperm = msg.perm_president)
+        User.objects.update_user(user.id, userperm = 5)
         updated_user = User.objects.get_user(user.id)
-        self.assertEqual(updated_user.userperm, msg.perm_president)
+        self.assertEqual(updated_user.userperm, "5")
  
 
 
