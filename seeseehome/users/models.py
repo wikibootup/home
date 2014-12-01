@@ -62,15 +62,13 @@ class UserManager(BaseUserManager):
             raise ValidationError(msg.users_pwd_no_special_char)
 
     def validate_userperm(self, userperm):
-        if userperm < 1:
+        if (userperm == 1) or (userperm == 2) or (userperm == 3) or \
+            (userperm == 4) or (userperm == 5):
+            pass
+        else:
             raise ValidationError(
-                msg.users_userperm_at_least_1,
+                msg.users_userperm_validation_error,
             )
-        elif userperm > 31:
-            raise ValidationError(
-                msg.users_userperm_at_most_31,
-            )
- 
 
 ##########
 ##### RETRIEVE
