@@ -22,7 +22,7 @@ class UserManagerTestCase(TestCase):
                    email = testdata.users_valid_email,
                    password = testdata.users_valid_password,
                )
-        self.assertEqual(user.userperm, msg.perm_user)
+        self.assertEqual(user.userperm, testdata.perm_user)
 
     def test_create_superuser(self):
         user = User.objects.create_superuser(
@@ -146,7 +146,7 @@ class UserManagerTestCase(TestCase):
                    email = testdata.users_valid_email,
                    password = testdata.users_valid_password,
                )
-        self.assertEqual(user.userperm, msg.perm_user)
+        self.assertEqual(user.userperm, testdata.perm_user)
         User.objects.update_user(user.id, userperm = 5)
         updated_user = User.objects.get_user(user.id)
         self.assertEqual(updated_user.userperm, "5")
