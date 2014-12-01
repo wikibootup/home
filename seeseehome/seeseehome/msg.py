@@ -4,10 +4,9 @@
 perm_anonymous = 0
 perm_user = 1
 perm_member = 2
-perm_coremember = 4
-perm_graduate = 8
-perm_president = 16
-perm_all = 31
+perm_coremember = 3
+perm_graduate = 4
+perm_president = 5
 
 ### edit password
 users_change_pwd_error = "ERROR : Change Password"
@@ -37,9 +36,7 @@ sers_update_is_admin_must_be_bool_type = \
     "The type of is_admin argument is must be bool"
 
 ### userperm
-users_userperm_at_least_1 = "User permission sholud be at least 1"
-users_userperm_at_most_31 = "User permission should be at most 31"
-
+users_userperm_validation_error = "userperm is must be either 1,2,3,4,5"
 ### signup
 users_signup_error = "ERROR : Sign Up"
 users_signup_success = "SUCCESS : Sign Up"
