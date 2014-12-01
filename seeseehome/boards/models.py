@@ -18,7 +18,8 @@ class BoardManager(models.Manager):
         return self._create_board(boardname)
 
     def validate_max_number_of_boards(self, num_of_boards):
-        if num_of_boards > 10:
+#       Number of Boards are already more than or equal to 10?        
+        if num_of_boards >= 10:
             raise ValidationError(msg.boards_max_number_of_boards)
         return True
 
@@ -38,7 +39,7 @@ class BoardManager(models.Manager):
             return None
 
 ##########
-##### UPDATE
+##### UPDATE : This is only applied in admin page.
     def update_board(self, id, **extra_fields):
         board = Board.objects.get_board(id)
         if 'boardname' in extra_fields:
@@ -63,14 +64,18 @@ class Board(models.Model):
                     default = '',
                 )
 
+    """
+    * Warning : char field is set to unicode
+    """
     readperm = MultiSelectField(
                     help_text = ('Available Read Permission (It is possible'
                     ' to select multiple[ User, Member, '
                     'Core member, Graduate, President ]'),
-                    choices = ((1, 'User'), (2, 'Member'), (3, 'Core member'),
-                                (4, 'Graduate'), (5, 'President')),
-                    default = [1,2,3,4,5],
-                    max_length = 15,
+                    choices = (('1', 'User'), ('2', 'Member'), 
+                        ('3', 'Core member'), ('4', 'Graduate'), 
+                        ('5', 'President')),
+                    default = ['1','2','3','4','5'],
+                    max_length = 9,
                     max_choices=5,
                )
                    
@@ -78,13 +83,19 @@ class Board(models.Model):
                     help_text = ('Available Write Permission (It is possible'
                     'to select multiple[ User, Member, '
                     'Core member, Graduate, President ]'),
-                    choices = ((1, 'User'), (2, 'Member'), (3, 'Core member'),
-                                (4, 'Graduate'), (5, 'President')),
-                    default = [1,2,3,4,5],
-                    max_length = 15,
+                    choices = (('1', 'User'), ('2', 'Member'), 
+                        ('3', 'Core member'), ('4', 'Graduate'), 
+                        ('5', 'President')),
+                    default = ['1', '2', '3', '4', '5'],
+                    max_length = 9,
                     max_choices=5,
                )
-   
+
+#   for showing user name instead of object itself in admin page
+    def __unicode__(self):
+       return 'Board name: ' + self.boardname
+ 
+
 class PostManager(models.Manager):
     ##### CREATE
     def _create_post(self, board, subject, writer, **extra_fields):
@@ -100,9 +111,9 @@ class PostManager(models.Manager):
             is_valid_content = self.validate_content(content)
 
 #       writer
-        is_valid_writer = self.is_valid_perm(
-                              boardperm = board.writeperm, 
-                              userperm = writer.userperm
+        is_valid_writer = self.is_valid_writeperm(
+                              board = board, 
+                              writer = writer
                           )
         if not is_valid_writer:
             raise ValidationError(msg.boards_writer_perm_error)
@@ -139,12 +150,15 @@ class PostManager(models.Manager):
        else:
             return True
 
-    def is_valid_perm(self, boardperm, userperm):
-        is_valid_perm = False
-        for perm in boardperm:
-            if perm == userperm:
-                is_valid_perm = True
-        return is_valid_perm
+    def is_valid_writeperm(self, board, writer):
+        return bool(str(board.writeperm).find(writer.userperm) >= 1)
+
+        """
+        Following code is more simple and operates well,
+        but it occurs some problems in the test codes
+        ( double wrapping of unicode & list )
+        """
+#        return bool(writer.userperm in board.writeperm)
 
     ##########
     ##### RETRIEVE
@@ -187,7 +201,15 @@ class Post(models.Model):
                 through_fields = ('post', 'board'),
                 related_name="posts_mtom"
             )
+
+#   It is used to show date posted in admin page 
+    date_posted = models.DateTimeField(db_index=True, auto_now_add=True, 
+            help_text = "It is used to show date posted in admin page")
     
+#   for showing user name instead of object itself
+    def __unicode__(self):
+       return ('Writer: ' + self.writer.username + ", " +\
+                "Subject: " + self.subject)
 
 class BoardPostsManager(models.Manager):
     def _create_board_posts(self, board, post):
@@ -218,7 +240,12 @@ class BoardPosts(models.Model):
                Post,
                verbose_name = "post foreign key",
                related_name="post_foreignkey",
-            )    
+            )
 
-    posted_date = models.DateTimeField(db_index=True, auto_now_add=True)
-    
+#  It is used to show data in orders in board page    
+    date_baord_posts_created = \
+            models.DateTimeField(
+                db_index=True, auto_now_add=True,
+                help_text = "It is used to show data in orders in board page"
+            )
+ 
