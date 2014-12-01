@@ -50,8 +50,9 @@ INSTALLED_APPS = (
     'users',
     'boards',
 
-#   Python Packages
+#   Django Packages
     'ckeditor',
+    'multiselectfield',
 )
 
 MIDDLEWARE_CLASSES = (
