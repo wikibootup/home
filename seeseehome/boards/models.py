@@ -3,6 +3,7 @@ from users.models import User
 #from posts.models import Post
 from seeseehome import msg
 from django.core.exceptions import ObjectDoesNotExist,ValidationError
+from multiselectfield import MultiSelectField
 
 class BoardManager(models.Manager):
 ##### CREATE
@@ -57,24 +58,33 @@ class Board(models.Model):
     objects = BoardManager()
 
     boardname = models.CharField(
-                    help_text = "Board subject",
+                    help_text = "Board name",
                     max_length = 255,
                     default = '',
                 )
 
-    readperm = models.IntegerField(
-                   help_text = "Read permission ( anonymous :0, user : 1, "
-                   "member : 2, coremember : 4, graduate : 8, "
-                   "president : 16, all : 31 )",
-                   default=msg.perm_all
+    readperm = MultiSelectField(
+                    help_text = ('Available Read Permission (It is possible'
+                    ' to select multiple[ User, Member, '
+                    'Core member, Graduate, President ]'),
+                    choices = ((1, 'User'), (2, 'Member'), (3, 'Core member'),
+                                (4, 'Graduate'), (5, 'President')),
+                    default = [1,2,3,4,5],
+                    max_length = 15,
+                    max_choices=5,
                )
-    writeperm = models.IntegerField(
-                    help_text = "Read permission ( anonymous :0, user : 1, "
-                    "member : 2, coremember : 4, graduate : 8, "
-                    "president : 16, all : 31 )",
-                    default=msg.perm_all
-                )
-
+                   
+    writeperm = MultiSelectField(
+                    help_text = ('Available Write Permission (It is possible'
+                    'to select multiple[ User, Member, '
+                    'Core member, Graduate, President ]'),
+                    choices = ((1, 'User'), (2, 'Member'), (3, 'Core member'),
+                                (4, 'Graduate'), (5, 'President')),
+                    default = [1,2,3,4,5],
+                    max_length = 15,
+                    max_choices=5,
+               )
+   
 class PostManager(models.Manager):
     ##### CREATE
     def _create_post(self, board, subject, writer, **extra_fields):
@@ -130,7 +140,11 @@ class PostManager(models.Manager):
             return True
 
     def is_valid_perm(self, boardperm, userperm):
-        return bool(boardperm & userperm)
+        is_valid_perm = False
+        for perm in boardperm:
+            if perm == userperm:
+                is_valid_perm = True
+        return is_valid_perm
 
     ##########
     ##### RETRIEVE
