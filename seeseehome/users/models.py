@@ -148,10 +148,11 @@ class User(AbstractBaseUser):
     userperm = models.CharField(
                    help_text = 'Available User Permission [ User, Member, '
                     'Core member, Graduate, President ]',
-                   choices = ((1, 'User',), (2, 'Member'), (3, 'Core member'),
-                                (4, 'Graduate'), (5, 'President')),
-                   default=1,
-                   max_length = 15,
+                   choices = (('1', 'User',), ('2', 'Member'), 
+                       ('3', 'Core member'), ('4', 'Graduate'), 
+                       ('5', 'President')),
+                   default='1',
+                   max_length = 1,
                )
 
     def deactivate(self):
@@ -188,4 +189,8 @@ class User(AbstractBaseUser):
         "Does the user have permissions to view the app `app_label`?"
         # Simplest possible answer: Yes, always
         return True
+
+#   for showing user name instead of object itself
+    def __unicode__(self):
+       return 'User name: ' + self.username
 
