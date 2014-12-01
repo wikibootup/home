@@ -25,7 +25,7 @@ users_pwd_no_special_char = "User password must contain special character"
 
 ### username
 users_name_must_be_set = "User name must be set"
-users_name_at_most_30 = "User name length is limited to 30"
+users_name_at_most_30 = "User name length is limited to 30.\n"
 users_invalid_name = "User name cannot contain special characters" + \
                     "except for under bar_ , hyphen -"
 
