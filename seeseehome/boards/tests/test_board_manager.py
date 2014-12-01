@@ -6,6 +6,9 @@ from seeseehome import testdata
 class BoardManagerTestCase(TestCase):
     def setUp(self):
         pass
+
+##########
+##### CREATE BOARD TEST
     
     def test_create_board(self):
         self.assertIsNotNone(
@@ -23,7 +26,21 @@ class BoardManagerTestCase(TestCase):
                 id = board.id
             )
         )
-    
+
+    def test_max_num_of_boards(self):
+#       Create Board : 10 times.        
+        for num in range(10):
+            Board.objects.create_board(
+                boardname = testdata.boards_valid_name + str(num),
+            )   
+        
+        self.assertRaises(
+            ValidationError,
+            Board.objects.create_board,
+            boardname = testdata.boards_valid_name,
+        )
+
+
 ##########
 ##### BOARDNAME TEST
     def test_board_name_argument_under_1_char(self):
@@ -40,18 +57,6 @@ class BoardManagerTestCase(TestCase):
             boardname = testdata.boards_name_over_30_char,
         )
 
-    def test_max_num_of_boards(self):
-        for num in range(11):
-            Board.objects.create_board(
-                boardname = testdata.boards_valid_name + str(num),
-            )   
-        
-        self.assertRaises(
-            ValidationError,
-            Board.objects.create_board,
-            boardname = testdata.boards_valid_name,
-        )
-        
 ##########
 ##### RETRIEVE
     def test_get_board(self):
@@ -75,7 +80,7 @@ class BoardManagerTestCase(TestCase):
     
 ##########
 ##### DELETE
-    def test_update_board_name(self):
+    def test_delete_board(self):
         board = Board.objects.create_board(
                    boardname = testdata.boards_old_name,
                )
