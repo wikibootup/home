@@ -143,12 +143,17 @@ class User(AbstractBaseUser):
                    default=False,
                    )
 
-    userperm = models.IntegerField(
+    """
+    Read/Write permission of Board model is described to multiple select field.
+    That is constructed by Char field. 
+    """
+    userperm = models.CharField(
                    help_text = 'Available User Permission [ User, Member, '
                     'Core member, Graduate, President ]',
-                   choices = ((1, 'User',), (2, 'Member'), (4, 'Core member'),
-                                (8, 'Graduate'), (16, 'President')),
-                   default=msg.perm_user
+                   choices = ((1, 'User',), (2, 'Member'), (3, 'Core member'),
+                                (4, 'Graduate'), (5, 'President')),
+                   default=1,
+                   max_length = 15,
                )
 
     def deactivate(self):
