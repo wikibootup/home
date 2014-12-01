@@ -18,6 +18,8 @@ def write(request, board_id, **extra_fields):
     if request.method == 'POST':
         is_valid_content = False
 
+#       does the writer have valid write permission?
+
 #       board
         board = Board.objects.get_board(board_id)
 
@@ -58,12 +60,8 @@ def write(request, board_id, **extra_fields):
             return HttpResponseRedirect(reverse("users:login"))
  
 #       write permission check
-        if Post.objects.is_valid_perm(
-               boardperm = board.writeperm, 
-               userperm = writer.userperm
-           ):
-            is_valid_writer = True
-        else:
+        if not Post.objects.is_valid_writeperm(
+                board = board, writer = writer):
             messages.error(request, msg.boards_write_error)
             messages.info(request, msg.boards_writer_perm_error)
             return HttpResponseRedirect(reverse("boards:write",
@@ -87,7 +85,7 @@ def write(request, board_id, **extra_fields):
         messages.info(request, msg.boards_write_success_info)
 
         boardposts = \
-            (BoardPosts.objects.filter(board=board)).order_by('-posted_date')
+            (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
         custom_paginator = pagination(
                                boardposts=boardposts, 
                                posts_per_page = 10
@@ -106,7 +104,7 @@ def rewrite(request, board_id, post_id):
     if request.method == 'POST':
         write(request, board_id, post_id=post.id)
         boardposts = \
-            (BoardPosts.objects.filter(board=board)).order_by('-posted_date')
+            (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
         custom_paginator = pagination(
                                boardposts=boardposts, 
                                posts_per_page = 10
@@ -155,7 +153,7 @@ def boardpage(request, board_id, page):
 
 #   the following line is important to the page list (prev page, next page)
     boardposts = \
-        (BoardPosts.objects.filter(board=board)).order_by('-posted_date')
+        (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
     custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
                         page=page)
 
