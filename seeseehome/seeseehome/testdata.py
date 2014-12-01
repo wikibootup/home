@@ -1,5 +1,12 @@
+#-*- coding: utf-8 -*-
 ###### All apps
-
+#### permission
+perm_anonymous = '0'
+perm_user = '1'
+perm_member = '2'
+perm_coremember = '3'
+perm_graduate = '4'
+perm_president = '5'
 
 #### users
 users_valid_email = "test@example.com"
@@ -33,4 +40,9 @@ boards_valid_name = "Available_-123Board-Name!@#$"
 boards_invalid_name_exceed_the_maximum = "a" * 31
 boards_name_over_30_char = "a" * 31
 boards_name_under_1_char = ""
+
+#### posts
+posts_valid_subject = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
+posts_valid_content = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
+
 
