@@ -98,6 +98,18 @@ boards_post_arg_error = \
 boards_write_error = "ERROR : Write Error"
 boards_write_success = "SUCCESS : Write Success"
 boards_write_success_info = "You posted successfully"
-baords_anonymous_user_access = "Only login user must write a text"
+baords_anonymous_user_write = "Only logged-in user can write a text"
 boards_access_perm = "You don't have the permission to access this board"
 boards_writer_perm_error = "You cannot write in this board ( pemission )"
+
+### board read permission
+boards_read_error = "ERRROR : Read Error"
+boards_read_error_info = \
+    "You don't have permission to access this board and read posts"
+baords_anonymous_user_read = \
+    "Only logged-in user can access this board and read posts"
+boards_reader_perm_error = \
+    "You cannot access this board and read posts( pemission )"
+
+
+
