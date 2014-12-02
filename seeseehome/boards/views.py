@@ -163,7 +163,7 @@ def boardpage(request, board_id, page):
            board = board, reader = reader):
         messages.error(request, msg.boards_read_error)
         messages.info(request, msg.boards_reader_perm_error)
-        return HttpResponseRedirect(reverse("boards:boardlist")) 
+        return HttpResponseRedirect(reverse("home")) 
 
 #   The following line is important to the page list (prev page, next page)
     boardposts = \
@@ -182,8 +182,4 @@ def boardpage(request, board_id, page):
                    'previous_page' : custom_paginator['previous_page'],
                }
            )
-
-def boardlist(request):
-    boardlist = Board.objects.all()
-    return render(request, "boards/boardlist.html", {'boardlist' : boardlist})
 
