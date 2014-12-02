@@ -15,14 +15,28 @@ def write(request, board_id, **extra_fields):
 #   django-ckform not used. 
 #   ckeditor widget class is used in template instead)
 #   form = WriteForm()
+
+#   board
+    board = Board.objects.get_board(board_id)
+
+#   writer ( double validation for login, first : @login_required )
+    try:
+        writer = User.objects.get_user(request.user.id)
+    except:
+        messages.error(request, msg.boards_write_error)
+        messages.info(request, msg.boards_anonymous_users_write) 
+        return HttpResponseRedirect(reverse("users:login"))
+
+#   does the writer have valid write permission?
+    if not Post.objects.is_valid_writeperm(
+           board = board, writer = writer):
+        messages.error(request, msg.boards_write_error)
+        messages.info(request, msg.boards_writer_perm_error)
+        return HttpResponseRedirect(reverse("boards:boardpage", 
+            args=(board_id, 1)))
+
     if request.method == 'POST':
         is_valid_content = False
-
-#       does the writer have valid write permission?
-
-#       board
-        board = Board.objects.get_board(board_id)
-
 #       subject
         subject = request.POST['subject']
         try:
@@ -50,22 +64,6 @@ def write(request, board_id, **extra_fields):
                         args=(board_id)))
             else:
                 is_valid_content = True
-
-#       writer
-        try:
-            writer = User.objects.get_user(request.user.id)
-        except:
-            messages.error(request, msg.boards_write_error)
-            messages.info(request, msg.boards_anonymous_users_access) 
-            return HttpResponseRedirect(reverse("users:login"))
- 
-#       write permission check
-        if not Post.objects.is_valid_writeperm(
-                board = board, writer = writer):
-            messages.error(request, msg.boards_write_error)
-            messages.info(request, msg.boards_writer_perm_error)
-            return HttpResponseRedirect(reverse("boards:write",
-                    args=(board_id)))
 
 #       post save
 #       If rewrite, no create, but update
@@ -146,12 +144,28 @@ def pagination(boardposts, posts_per_page, page=1):
                            }
     return custom_paginator
 
+@login_required
 def boardpage(request, board_id, page):
-#   get board
+#   Get board
     board = Board.objects.get_board(board_id)
 
+#   Read & Access permission 
+#   ( double validation for login, first : @login_required )
+    try:
+        reader = User.objects.get_user(request.user.id)
+    except:
+        messages.error(request, msg.boards_read_error)
+        messages.info(request, msg.boards_anonymous_users_read) 
+        return HttpResponseRedirect(reverse("users:login"))
 
-#   the following line is important to the page list (prev page, next page)
+#   Does the writer have valid write permission?
+    if not Board.objects.is_valid_readperm(
+           board = board, reader = reader):
+        messages.error(request, msg.boards_read_error)
+        messages.info(request, msg.boards_reader_perm_error)
+        return HttpResponseRedirect(reverse("boards:boardlist")) 
+
+#   The following line is important to the page list (prev page, next page)
     boardposts = \
         (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
     custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
