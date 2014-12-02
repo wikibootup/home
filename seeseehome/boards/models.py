@@ -30,6 +30,10 @@ class BoardManager(models.Manager):
             raise ValidationError(msg.boards_name_at_most_30)
         return True
 
+    def is_valid_readperm(self, board, reader):
+        return bool(str(board.readperm).find(reader.userperm) >= 1)
+
+
 ##########
 ##### RETRIEVE
     def get_board(self, id):
