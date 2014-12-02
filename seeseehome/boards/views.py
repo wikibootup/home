@@ -171,9 +171,14 @@ def boardpage(request, board_id, page):
     custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
                         page=page)
 
+#   for board list of menu bar
+    boardlist = Board.objects.all()
+
     return render(request, "boards/boardpage.html", 
                {
                    'board_id' : board_id,
+                   'board' : board,
+                   'boardlist' : boardlist,
                    'boardposts' : custom_paginator['boardposts'],
                    'paginator' :custom_paginator['paginator'],
                    'has_next' : custom_paginator['has_next'],
