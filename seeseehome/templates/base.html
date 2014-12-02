@@ -17,6 +17,7 @@
     <link href="{% static 'css/navbar.css' %}" rel="stylesheet">
     <link href="{% static 'css/signin.css' %}" rel="stylesheet">
     <link href="{% static 'css/jquery.gritter.css' %}" rel="stylesheet">
+    <link href="{% static 'css/dashboard.css' %}" rel="stylesheet">
  
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -28,7 +29,6 @@
   <body>
     {% block content %}
     {% endblock %}
-    <p>{{ user }}</p>
 
     <!-- message information in message.html -->
     {% include 'message.html' %}
@@ -43,16 +43,14 @@
     <!-- for message fade out method-->
     <script type="text/javascript" src="{% static 'js/jquery-latest.js' %}"></script>
     <!-- for self disappearing message -->
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
     <!-- The following fade out method shoule be moved into static files directory for readibility -->
     <script>
       $(document).ready(function(){
         setTimeout(function() {
           $('.gritter-item-wrapper').fadeOut('slow');
-        }, 3000); // <-- time in milliseconds
+        }, 2000); // <-- time in milliseconds
       });
     </script>
-
     <script type="text/javascript" src="{% static 'ckeditor/ckeditor/ckeditor.js' %}"></script>
     <script type="text/javascript" src="{% static 'ckeditor/ckeditor-init.js' %}"></script>
  
