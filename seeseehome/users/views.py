@@ -67,12 +67,11 @@ def signup(request):
     ### username
     if request.method == 'POST':
         username = request.POST['username']
-
 #       username validator
         try:
             User.objects.validate_username(username)
         except ValidationError:
-          message.error(request, msg.users_signup_error)
+          messages.error(request, msg.users_signup_error)
           messages.info(request, msg.users_invalid_name)
           return HttpResponseRedirect(reverse("users:signup"))
         
