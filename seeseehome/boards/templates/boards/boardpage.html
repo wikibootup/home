@@ -7,7 +7,7 @@
           <ul class="nav nav-sidebar">
           </ul>
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="{% url 'boards:write' board_id %}">Write<span class="sr-only">(current)</span></a></li>
+            <li class="active"><a href="{% url 'boards:write' board.id %}">Write<span class="sr-only">(current)</span></a></li>
  
             <li><a href="">Nav item</a></li>
             <li><a href="">Nav item again</a></li>
@@ -44,10 +44,10 @@
                 {% if boardposts %}
                  {% for boardpost in boardposts %}
                    <tr>
-                     <td>#####</td>
-                     <td><a href="{% url 'boards:postpage' board_id boardpost.post.id %}">{{ boardpost.post.subject }}</a></td>
-                     <td>{{ boardpost.post.writer.username }}</td>
-                     <td>{{ boardpost.post.date_posted }}</td>
+                     <td width="10%">#####</td>
+                     <td width="60%"><a href="{% url 'boards:postpage' board_id boardpost.post.id %}">{{ boardpost.post.subject }}</a></td>
+                     <td width="10%">{{ boardpost.post.writer.username }}</td>
+                     <td width="20%">{{ boardpost.post.date_posted }}</td>
                    </tr>
                  {% endfor %}  
                  {% endif %}
