@@ -7,7 +7,7 @@
           <ul class="nav nav-sidebar">
           </ul>
           <ul class="nav nav-sidebar">
-            <li class="active"><a href="{% url 'boards:write' board.id %}">Write<span class="sr-only">(current)</span></a></li>
+            <li class="active"><a href="{% url 'linkboard:linkpost' %}">Link Post<span class="sr-only">(current)</span></a></li>
  
             <li><a href="">Nav item</a></li>
             <li><a href="">Nav item again</a></li>
@@ -33,10 +33,10 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Subject</th>
-                  <th>Writer</th>
-                  <th>Date posted</th>
+                  <th width="10%">#</th>
+                  <th width="60%">Description</th>
+                  <th width="10%">Writer</th>
+                  <th width="20%">Date posted</th>
                 </tr>
               </thead>
               <tbody>
