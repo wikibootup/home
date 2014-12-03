@@ -113,4 +113,10 @@ boards_reader_perm_error = \
     "You cannot access this board and read posts( pemission )"
 
 
+#### linkboard
+linkboard_linkpost_invalid_writer_perm = \
+        "You don't have permission to write in this board"
+linkboard_read_error = "ERRROR : Read Error"
+linkboard_anonymous_user_read = \
+    "Only logged-in user can access this board and read posts"
 
