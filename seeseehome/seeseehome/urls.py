@@ -17,4 +17,8 @@ urlpatterns = patterns('',
 #   boards' urls
     url(r'^', include('boards.urls', namespace='boards')),
 
+#   linkboard' urls
+    url(r'^', include('linkboard.urls', namespace='linkboard')),
+
+
 )
