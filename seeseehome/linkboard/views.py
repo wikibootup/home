@@ -8,6 +8,17 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from linkboard.models import LinkPost
 from users.models import User
+from boards.models import Board
+
+@login_required
+def linkpost(request):
+    if request.method == 'POST':
+        pass
+
+    boardlist = Board.objects.all()
+    return render(request, "linkboard/linkpost.html", {'boardlist':boardlist})
+
+
 
 def pagination_of_linkboard(posts, posts_per_page=10, page=1):
 #   posts per page
@@ -53,6 +64,8 @@ def linkboardpage(request, page=1):
                            posts_per_page = 10,
                            page=page
                        )
+    
+    boardlist = Board.objects.all()
 
     return render(request, "linkboard/linkboardpage.html",
                {
@@ -62,6 +75,7 @@ def linkboardpage(request, page=1):
                    'has_previous' : custom_paginator['has_previous'],
                    'nextpage' : custom_paginator['nextpage'],
                    'previous_page' : custom_paginator['previous_page'],
+                   'boardlist' : boardlist,
                }
            )
 
