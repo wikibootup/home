@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+{% include "menu.html" %}
   <h2>Personal info</h2>
 
   <a href="{% url 'users:editpwd' %}">Edit password</a>
