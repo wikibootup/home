@@ -16,6 +16,9 @@ def write(request, board_id, **extra_fields):
 #   ckeditor widget class is used in template instead)
 #   form = WriteForm()
 
+#   for prevent the error "referenced before assignment"
+    #post_id = None
+
 #   board
     board = Board.objects.get_board(board_id)
 
@@ -79,17 +82,17 @@ def write(request, board_id, **extra_fields):
             if is_valid_content:
                 Post.objects.update_post(post_id, content=content)
 
-        messages.success(request, msg.boards_write_success)
-        messages.info(request, msg.boards_write_success_info)
-
-        boardposts = \
-            (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
-        custom_paginator = pagination(
-                               boardposts=boardposts, 
-                               posts_per_page = 10
-                           )
-        return HttpResponseRedirect(reverse("boards:boardpage",
-            args=(board_id, 1)))
+            messages.success(request, msg.boards_write_success)
+            messages.info(request, msg.boards_write_success_info)
+    
+            boardposts = \
+                (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
+            custom_paginator = pagination(
+                                   boardposts=boardposts, 
+                                   posts_per_page = 10
+                               )
+            return HttpResponseRedirect(reverse("boards:postpage",
+                args=(board_id, post_id)))
 
     return render(request, "boards/write.html")
 
@@ -100,15 +103,15 @@ def rewrite(request, board_id, post_id):
     post = Post.objects.get_post(post_id) 
     
     if request.method == 'POST':
-        write(request, board_id, post_id=post.id)
+        write(request, board_id, post_id=post_id)
         boardposts = \
             (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
         custom_paginator = pagination(
                                boardposts=boardposts, 
                                posts_per_page = 10
                            )
-        return HttpResponseRedirect(reverse("boards:boardpage",
-            args=(board_id, 1)))
+        return HttpResponseRedirect(reverse("boards:postpage",
+            args=(board_id, post_id)))
 
     return render(request, "boards/rewrite.html",
             {'board' : board, 'post' : post})
@@ -116,8 +119,9 @@ def rewrite(request, board_id, post_id):
 def postpage(request, board_id, post_id):
     board = Board.objects.get_board(board_id)
     post = Post.objects.get_post(post_id) 
+    boardlist = Board.objects.all()
     return render(request, "boards/postpage.html",
-            {'board' : board, 'post' : post})
+            {'board' : board, 'post' : post, 'boardlist' : boardlist})
 
 def pagination(boardposts, posts_per_page, page=1):
 #   posts per page
