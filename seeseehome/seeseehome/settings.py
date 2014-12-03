@@ -49,6 +49,7 @@ INSTALLED_APPS = (
 #   Custom apps
     'users',
     'boards',
+    'linkboard',
 
 #   Django Packages
     'ckeditor',
