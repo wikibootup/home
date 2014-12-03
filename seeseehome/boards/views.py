@@ -89,7 +89,9 @@ def write(request, board_id, **extra_fields):
 #           no need to HttpResponseRedirect, That is inplementeed in 
 #           rewrite mothod
 
-    return render(request, "boards/write.html")
+    boardlist = Board.objects.all()
+
+    return render(request, "boards/write.html", {'boardlist' : boardlist})
 
 #@login_required
 def rewrite(request, board_id, post_id):
@@ -108,8 +110,10 @@ def rewrite(request, board_id, post_id):
         return HttpResponseRedirect(reverse("boards:postpage",
             args=(board_id, post_id)))
 
+    boardlist = Board.objects.all()
+
     return render(request, "boards/rewrite.html",
-            {'board' : board, 'post' : post})
+            {'board' : board, 'post' : post, 'boardlist' : boardlist})
 
 def postpage(request, board_id, post_id):
     board = Board.objects.get_board(board_id)
