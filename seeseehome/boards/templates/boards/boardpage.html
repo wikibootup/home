@@ -54,18 +54,16 @@
                </tbody>
             </table>
 
-                 <h3 class="page-footer">
-                 {% if has_next %}
-                   <a href="{% url 'boards:boardpage' board_id nextpage %}">Next</a><br>
-                 {% endif %}
-
+                <div class="page-footer">
                  {% if has_previous %}
-                   <a href="{% url 'boards:boardpage' board_id previous_page %}">Prev</a><br>
+                 <a href="{% url 'boards:boardpage' board_id previous_page %}">Prev</a>
+                 {% endif %}
+    
+                 {% if has_next %}
+                 <a href="{% url 'boards:boardpage' board_id nextpage %}">Next</a>
                  {% endif %}
 
-
-                   
-                 </h3>
+                 </div>
 
 
           </div>
