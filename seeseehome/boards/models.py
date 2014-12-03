@@ -247,7 +247,7 @@ class BoardPosts(models.Model):
             )
 
 #  It is used to show data in orders in board page    
-    date_baord_posts_created = \
+    date_board_posts_created = \
             models.DateTimeField(
                 db_index=True, auto_now_add=True,
                 help_text = "It is used to show data in orders in board page"
