@@ -17,6 +17,7 @@ def migrating_set():
             "makemigrations",
             "users",
             "boards",
+            "linkboard",
         ]
     )
 
