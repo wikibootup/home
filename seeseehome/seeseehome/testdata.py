@@ -46,3 +46,7 @@ posts_valid_subject = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
 posts_valid_content = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
 
 
+#### linkboard
+linkboard_valid_description = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
+linkboard_valid_url = "https://github.com"
+
