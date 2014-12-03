@@ -3,7 +3,6 @@ from django.http import HttpResponse, HttpResponseRedirect, request
 from boards.models import *
 from seeseehome import msg
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -76,6 +75,9 @@ def write(request, board_id, **extra_fields):
 #       content save
             if is_valid_content:
                 Post.objects.update_post(post.id, content=content)
+
+            return HttpResponseRedirect(reverse("boards:postpage",
+                    args=(board_id, post.id)))
         else:
             post_id = extra_fields['post_id']
             Post.objects.update_post(post_id, subject=subject)
@@ -84,15 +86,8 @@ def write(request, board_id, **extra_fields):
 
             messages.success(request, msg.boards_write_success)
             messages.info(request, msg.boards_write_success_info)
-    
-            boardposts = \
-                (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
-            custom_paginator = pagination(
-                                   boardposts=boardposts, 
-                                   posts_per_page = 10
-                               )
-            return HttpResponseRedirect(reverse("boards:postpage",
-                args=(board_id, post_id)))
+#           no need to HttpResponseRedirect, That is inplementeed in 
+#           rewrite mothod
 
     return render(request, "boards/write.html")
 
@@ -105,7 +100,7 @@ def rewrite(request, board_id, post_id):
     if request.method == 'POST':
         write(request, board_id, post_id=post_id)
         boardposts = \
-            (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
+            (BoardPosts.objects.filter(board=board)).order_by('-date_board_posts_created')
         custom_paginator = pagination(
                                boardposts=boardposts, 
                                posts_per_page = 10
@@ -123,11 +118,11 @@ def postpage(request, board_id, post_id):
     return render(request, "boards/postpage.html",
             {'board' : board, 'post' : post, 'boardlist' : boardlist})
 
-def pagination(boardposts, posts_per_page, page=1):
+def pagination(boardposts, posts_per_page=10, page=1):
 #   posts per page
     start_pos = (int(page)-1) * posts_per_page
     end_pos = start_pos + posts_per_page
-    boardposts_per_page = boardposts[start_pos : end_pos]
+    boardposts_of_present_page = boardposts[start_pos : end_pos]
     paginator = Paginator(boardposts, posts_per_page).page(page)
     has_next = paginator.has_next()
     has_previous = paginator.has_previous()
@@ -139,7 +134,7 @@ def pagination(boardposts, posts_per_page, page=1):
         previous_page = paginator.previous_page_number()
 
     custom_paginator = {
-                               'boardposts' : boardposts_per_page,
+                               'boardposts' : boardposts_of_present_page,
                                'paginator' : paginator,
                                'has_next' : has_next,
                                'has_previous' : has_previous,
@@ -149,7 +144,7 @@ def pagination(boardposts, posts_per_page, page=1):
     return custom_paginator
 
 @login_required
-def boardpage(request, board_id, page):
+def boardpage(request, board_id, page=1):
 #   Get board
     board = Board.objects.get_board(board_id)
 
@@ -162,7 +157,7 @@ def boardpage(request, board_id, page):
         messages.info(request, msg.boards_anonymous_users_read) 
         return HttpResponseRedirect(reverse("users:login"))
 
-#   Does the writer have valid write permission?
+#   Does the writer has valid write permission?
     if not Board.objects.is_valid_readperm(
            board = board, reader = reader):
         messages.error(request, msg.boards_read_error)
@@ -171,7 +166,7 @@ def boardpage(request, board_id, page):
 
 #   The following line is important to the page list (prev page, next page)
     boardposts = \
-        (BoardPosts.objects.filter(board=board)).order_by('-date_baord_posts_created')
+        (BoardPosts.objects.filter(board=board)).order_by('-date_board_posts_created')
     custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
                         page=page)
 
