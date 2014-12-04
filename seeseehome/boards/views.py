@@ -18,16 +18,11 @@ def write(request, board_id, **extra_fields):
 #   for prevent the error "referenced before assignment"
     #post_id = None
 
-#   board
+#   board : argument for is_valid_writeperm
     board = Board.objects.get_board(board_id)
 
-#   writer ( double validation for login, first : @login_required )
-    try:
-        writer = User.objects.get_user(request.user.id)
-    except:
-        messages.error(request, msg.boards_write_error)
-        messages.info(request, msg.boards_anonymous_users_write) 
-        return HttpResponseRedirect(reverse("users:login"))
+#   writer : argument for is_valid_writeperm
+    writer = User.objects.get_user(request.user.id)
 
 #   does the writer have valid write permission?
     if not Post.objects.is_valid_writeperm(
@@ -149,17 +144,11 @@ def pagination(boardposts, posts_per_page=10, page=1):
 
 @login_required
 def boardpage(request, board_id, page=1):
-#   Get board
+#   board : for is_valid_readperm
     board = Board.objects.get_board(board_id)
 
-#   Read & Access permission 
-#   ( double validation for login, first : @login_required )
-    try:
-        reader = User.objects.get_user(request.user.id)
-    except:
-        messages.error(request, msg.boards_read_error)
-        messages.info(request, msg.boards_anonymous_users_read) 
-        return HttpResponseRedirect(reverse("users:login"))
+#   reader : for is_valid_readperm
+    reader = User.objects.get_user(request.user.id)
 
 #   Does the writer has valid write permission?
     if not Board.objects.is_valid_readperm(
