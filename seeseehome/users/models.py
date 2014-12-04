@@ -88,7 +88,21 @@ class UserManager(BaseUserManager):
         user = User.objects.get_user(id)
         if 'username' in extra_fields:
             self.validate_username(extra_fields['username'])
-            user.username = extra_fields['username']
+            try:
+                User.objects.get(username = extra_fields['username'])
+            except ObjectDoesNotExist:
+                user.username = extra_fields['username']
+            else:
+                raise ValidationError(msg.users_username_already_exist)
+
+        if 'email' in extra_fields:
+            validate_email(extra_fields['email'])
+            try:
+                User.objects.get(email = extra_fields['email'])
+            except ObjectDoesNotExist:
+                user.email = extra_fields['email']
+            else:
+                raise ValidationError(msg.users_email_already_exist)
 
         if 'userperm' in extra_fields:
             self.validate_userperm(extra_fields['userperm'])
@@ -102,6 +116,7 @@ class UserManager(BaseUserManager):
                 raise ValidationError(
                         msg.users_update_is_admin_must_be_bool_type)
 
+        
         user.save(using = self._db)
 
 ##########
