@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from django.test import TestCase
 from boards.models import Board
 from django.core.exceptions import ObjectDoesNotExist,ValidationError
