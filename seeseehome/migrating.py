@@ -10,6 +10,7 @@ def migrating_set():
     # subprocess.call(data type: list)
     # migrating from users -> teams -> projects
     #( It is important because MtoM relationship)
+    # for remain apps' fields
     subprocess.call(
         [
             "python",
@@ -21,7 +22,7 @@ def migrating_set():
         ]
     )
 
-    # for remain apps' fields
+
     subprocess.call(
         [
             "python",
