@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from django.db import models
 from users.models import User
 #from posts.models import Post
@@ -135,7 +136,7 @@ class PostManager(models.Manager):
                              board = board,
                              post = post,
                          )
-        boardposts.save()
+        boardposts.save(using=self._db)
         return post
 
     def create_post(self, board, subject, writer, **extra_fields):
@@ -208,9 +209,9 @@ class Post(models.Model):
 
 #   It is used to show date posted in admin page 
     date_posted = models.DateTimeField(db_index=True, auto_now_add=True, 
-            help_text = "It is used to show date posted in admin page")
+            help_text = "It is used to show the date posted in admin page")
     
-#   for showing user name instead of object itself
+#   for showing post information instead of object itself
     def __unicode__(self):
        return ('Writer: ' + self.writer.username + ", " +\
                 "Subject: " + self.subject)
@@ -252,4 +253,87 @@ class BoardPosts(models.Model):
                 db_index=True, auto_now_add=True,
                 help_text = "It is used to show data in orders in board page"
             )
- 
+
+class CommentManager(models.Manager):
+    ##### CREATE
+    def _create_comment(self, writer, board, post, comment):
+        is_valid_writer = False
+#       writer
+        is_valid_writer = Post.objects.is_valid_writeperm(
+                              board = board, 
+                              writer = writer
+                          )
+        if not is_valid_writer:
+            raise ValidationError(msg.boards_writer_perm_error)
+
+#       post
+        try:
+            post = Post.objects.get_post(post.id)
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(msg.board_comment_post_does_not_exist)
+
+#       board
+        try:
+            board = Board.objects.get_board(board.id)
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(msg.board_comment_board_does_not_exist)
+
+#       comment
+        self.validate_comment(comment)
+
+#       commentobject save
+        commentobject = self.model(writer=writer, post=post, board=board,
+                            comment=comment)
+        
+        commentobject.save(using=self._db)
+
+        return commentobject
+        
+    def create_comment(self, writer, board, post, comment):
+        return self._create_comment(writer=writer, board=board, post=post,
+                comment=comment)
+
+    def validate_comment(self, comment):
+        if not comment:
+            raise ValueError(msg.board_comment_must_be_set)
+        elif len(comment) > 255:
+            raise ValidationError(msg.board_comment_at_most_255)
+
+    ##########
+    ##### RETRIEVE
+    def get_comment(self, id):
+        try:
+            return Comment.objects.get(pk=id)
+        except Comment.DoesNotExist:
+            return None
+
+    ##########
+    ##### UPDATE
+    def update_comment(self, comment_id, **extra_fields):
+        commentobject = Comment.objects.get_comment(comment_id)
+        if 'comment' in extra_fields:
+            comment = extra_fields['comment']
+            self.validate_comment(comment)
+            commentobject.comment = comment
+
+        commentobject.save()
+
+class Comment(models.Model):
+    objects = CommentManager()
+    writer = models.ForeignKey(User)
+    board = models.ForeignKey(Board)
+    post = models.ForeignKey(Post)
+
+    comment = models.CharField(
+                  help_text = "Comment",
+                  max_length = 255,
+              )
+
+    date_commented = models.DateTimeField(db_index=True, auto_now_add=True, 
+            help_text = "It is used to show the date commented")
+    
+#   for showing comment information instead of object itself
+    def __unicode__(self):
+       return ('Writer: ' + self.writer.username + ", " +\
+                "Comment: " + self.comment)
+
