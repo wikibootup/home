@@ -8,6 +8,9 @@ urlpatterns = patterns('',
 #   main page
     url(r'^$', 'seeseehome.views.home', name='home'),
 
+#   about us
+    url(r'^aboutus/', 'seeseehome.views.aboutus', name='aboutus'),
+
 #   ckeditor set
     url(r'^ckeditor/', include('ckeditor.urls')),
 
