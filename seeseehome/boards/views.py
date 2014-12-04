@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, request
+from django.http import HttpResponse, HttpResponseRedirect, request, Http404
 from boards.models import *
 from seeseehome import msg
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
@@ -160,8 +160,13 @@ def boardpage(request, board_id, page=1):
 #   The following line is important to the page list (prev page, next page)
     boardposts = \
         (BoardPosts.objects.filter(board=board)).order_by('-date_board_posts_created')
-    custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
-                        page=page)
+
+#   if page does not exist, then raise 404
+    try:    
+        custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
+                            page=page)
+    except:
+        raise Http404
 
 #   for board list of menu bar
     boardlist = Board.objects.all()
