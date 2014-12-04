@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, request
+from django.http import HttpResponse, HttpResponseRedirect, request, Http404
 from seeseehome import msg
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
@@ -30,15 +30,15 @@ def linkpost(request):
             urlvalidator = URLValidator()
             urlvalidator(url)
         except ValidationError:
-            messages.error(self.request, msg.linkboard_linkpost_error)
-            messages.info(self.request, msg.linkboard_linkpost_invalid)
+            messages.error(request, msg.linkboard_linkpost_error)
+            messages.info(request, msg.linkboard_linkpost_invalid)
             return HttpResponseRedirect(
                        reverse("linkboard:linkboardpage", args=(1,)))
 
 
         except UnicodeError:
-            messages.error(self.request, msg.linkboard_linkpost_error)
-            messages.info(self.request, msg.linkboard_linkpost_unicode_error)
+            messages.error(request, msg.linkboard_linkpost_error)
+            messages.info(request, msg.linkboard_linkpost_unicode_error)
             return HttpResponseRedirect(
                        reverse("linkboard:linkboardpage", args=(1,)))
 
@@ -47,12 +47,12 @@ def linkpost(request):
             description = request.POST['description']
             LinkPost.objects.validate_description(description)
         except ValueError:
-             messages.error(self.request, msg.linkboard_linkpost_error)
-             messages.info(self.request, msg.boards_linkpost_description)
+             messages.error(request, msg.linkboard_linkpost_error)
+             messages.info(request, msg.boards_linkpost_description)
         except ValidationError:
-             messages.error(self.request, msg.linkboard_linkpost_error)
+             messages.error(request, msg.linkboard_linkpost_error)
              messages.info(
-                self.request, 
+                request, 
                 msg.boards_linkpost_description_at_most_255
              )
     
@@ -100,12 +100,17 @@ def pagination_of_linkboard(posts, posts_per_page=10, page=1):
 @login_required
 def linkboardpage(request, page=1):
     posts = LinkPost.objects.all().order_by('-date_posted')
-    custom_paginator = pagination_of_linkboard(
-                           posts=posts, 
-                           posts_per_page = 10,
-                           page=page
-                       )
-    
+
+#   if the page does not exist, raise 404
+    try:
+        custom_paginator = pagination_of_linkboard(
+                               posts=posts, 
+                               posts_per_page = 10,
+                               page=page
+                           )
+    except:
+        raise Http404
+
     boardlist = Board.objects.all()
 
     return render(request, "linkboard/linkboardpage.html",
