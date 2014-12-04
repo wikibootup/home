@@ -45,6 +45,12 @@ boards_name_under_1_char = ""
 posts_valid_subject = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
 posts_valid_content = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
 
+#### comments
+comments_valid_comment = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
+comments_comment_more_than_max_length = "1" * 256
+comments_old_comment = "Old Comment!ASAF올드"
+comments_new_comment = "New Comment!ASAF새거"
+
 
 #### linkboard
 linkboard_valid_description = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
