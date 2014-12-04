@@ -29,7 +29,10 @@
                     {# board page of <a> tag is linked to the first page of the target board #}
                       <li><a href="{% url 'boards:boardpage' board.id 1 %}">{{ board.boardname }}</a></li>
                     {% endfor %}  
+                  {% else %}
+                    &nbsp;No board yet
                   {% endif %}
+
                 </ul>
               </li>
               {% if user.is_admin %}
