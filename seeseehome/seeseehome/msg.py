@@ -120,3 +120,8 @@ linkboard_read_error = "ERRROR : Read Error"
 linkboard_anonymous_user_read = \
     "Only logged-in user can access this board and read posts"
 
+### linkpost
+linkboard_linkpost_error = "ERROR : Link Post"
+linkboard_linkpost_invalid = "The URL is invalid"
+linkboard_linkpost_unicode_error = "The URL has invalid domain part"
+
