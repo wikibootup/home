@@ -113,9 +113,29 @@ def rewrite(request, board_id, post_id):
 def postpage(request, board_id, post_id):
     board = Board.objects.get_board(board_id)
     post = Post.objects.get_post(post_id) 
+
+    if request.method == "POST":
+        comment = request.POST['comment']
+        try:
+            Comment.objects.validate_comment(comment)        
+        except ValueError:
+            messages.error(request, msg.board_comment_error)
+            messages.info(request, msg.board_comment_must_be_set)
+        except ValidationError:
+            messages.error(request, msg.board_comment_error)
+            messages.info(request, msg.board_comment_at_most_255)
+        else:
+            Comment.objects.create_comment(
+                writer=request.user, board = board,
+                post = post, comment = comment
+            )
+    commentlist = \
+        Comment.objects.filter(post=post).order_by('-date_commented')
+
     boardlist = Board.objects.all()
     return render(request, "boards/postpage.html",
-            {'board' : board, 'post' : post, 'boardlist' : boardlist})
+            {'board' : board, 'post' : post, 'boardlist' : boardlist,
+                'commentlist' : commentlist})
 
 def pagination(boardposts, posts_per_page=10, page=1):
 #   posts per page
