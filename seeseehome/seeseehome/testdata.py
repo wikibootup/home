@@ -1,5 +1,12 @@
+#-*- coding: utf-8 -*-
 ###### All apps
-
+#### permission
+perm_anonymous = '0'
+perm_user = '1'
+perm_member = '2'
+perm_coremember = '3'
+perm_graduate = '4'
+perm_president = '5'
 
 #### users
 users_valid_email = "test@example.com"
@@ -33,4 +40,19 @@ boards_valid_name = "Available_-123Board-Name!@#$"
 boards_invalid_name_exceed_the_maximum = "a" * 31
 boards_name_over_30_char = "a" * 31
 boards_name_under_1_char = ""
+
+#### posts
+posts_valid_subject = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
+posts_valid_content = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
+
+#### comments
+comments_valid_comment = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
+comments_comment_more_than_max_length = "1" * 256
+comments_old_comment = "Old Comment!ASAF올드"
+comments_new_comment = "New Comment!ASAF새거"
+
+
+#### linkboard
+linkboard_valid_description = "123!@#asdASDㅁㄴㅇㄲㄸㅆ _-!"
+linkboard_valid_url = "https://github.com"
 

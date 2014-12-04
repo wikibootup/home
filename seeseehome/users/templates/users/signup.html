@@ -1,13 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>Sign up</h2>
-  <form method="POST">{% csrf_token %}
-    <input name="username" type="text" placeholder="Enter User name" maxlength="30" class="basic_input" required>
-    <input name="email" type="text" placeholder="Enter Email" maxlength="64" class="basic_input" required>
-    <input name="pwd" type="password" placeholder="Enter Password" maxlength="255" class="basic_input" required>
-    <input name="confirm_pwd" type="password" placeholder="Confirm Your Password" maxlength="255" class="basic_input" required>
-    <input name="signup_submit" type="submit" value="Sign up">
-  </form>
+
+  <!-- Custom styles for this template -->
+
+    <div class="container">
+
+      <form class="form-signin" role="form" method="POST">{% csrf_token %}
+        <h2 class="form-signin-heading">Sign up</h2>
+        <label for="inputEmail" class="sr-only">User name</label>
+        <input name="username" type="text" id="inputEmail" class="form-control" placeholder="Enter User name" maxlength="30" required autofocus>
+
+        <label for="inputEmail" class="sr-only">Email</label>
+        <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Enter Email" maxlength="64" required>
+
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input name="pwd" type="password" id="inputPassword" class="form-control" placeholder="Enter Password" maxlength="255" required>
+
+        <label for="inputPassword" class="sr-only">Password Confirmation</label>
+        <input name="confirm_pwd" type="password" id="inputPassword" class="form-control" placeholder="Confirm Your Password" maxlength="255" required>
+
+        <input class="btn btn-lg btn-primary btn-block" name="signup_submit" type="submit" value="Sign up"></input>
+      </form>
+
+    </div> <!-- /container -->
+
 <a href="{% url 'home' %}">Main</a>
 {% endblock %}
 

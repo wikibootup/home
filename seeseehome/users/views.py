@@ -8,6 +8,7 @@ from django.core.validators import validate_email
 from django.core.urlresolvers import reverse
 from django.contrib.auth import login as _login, logout as _logout
 from django.contrib.auth.decorators import login_required
+from boards.models import Board
 
 # I couldn't solve built-in authenticate problem yet
 # So I use custom authenticate(But It is almost same as built-in authenticate)
@@ -25,12 +26,8 @@ def authenticate(username=None, password=None):
         user.backend = 'django.contrib.auth.backends.ModelBackend'
         return user
 
-def delete_dicts(dicts):
-    for dict_var in dicts:
-        del dicts[dict_var]
-
 def login(request):
-    ### username
+#   username
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['pwd']
@@ -71,17 +68,15 @@ def signup(request):
     ### username
     if request.method == 'POST':
         username = request.POST['username']
-        ## username validator
+#       username validator
         try:
             User.objects.validate_username(username)
         except ValidationError:
-          message.error(request, msg.users_signup_error)
+          messages.error(request, msg.users_signup_error)
           messages.info(request, msg.users_invalid_name)
-          delete_dicts(request.POST)
           return HttpResponseRedirect(reverse("users:signup"))
         
-        ####
-        ## username unique check
+#       username unique check
         try:
             User.objects.get(username = username)
         except ObjectDoesNotExist:
@@ -91,8 +86,7 @@ def signup(request):
             messages.info(request, msg.users_exist_name)
             return HttpResponseRedirect(reverse("users:signup"))
             
-        ######
-        ### email
+#       email
         email = request.POST['email']
         try:
             validate_email(email)
@@ -101,8 +95,7 @@ def signup(request):
             messages.info(request, msg.users_invalid_email)
             return HttpResponseRedirect(reverse("users:signup"))
         
-        ####
-        ## email unique check
+#       email unique check
         try:
             User.objects.get(email = email)
         except ObjectDoesNotExist:
@@ -112,8 +105,7 @@ def signup(request):
             messages.info(request, msg.users_exist_email)
             return HttpResponseRedirect(reverse("users:signup"))
         
-        ######
-        ### password
+#       password
         password = request.POST['pwd']
         password_confirmation = request.POST['confirm_pwd']
         
@@ -121,16 +113,15 @@ def signup(request):
             messages.error(request, msg.users_signup_error)
             messages.info(request, msg.users_confirm_pwd_error)
             return HttpResponseRedirect(reverse("users:signup"))
-
-        try:
-            User.objects.validate_password(password)
-        except ValidationError:
-            messages.error(request, msg.users_signup_error)
-            messages.info(request, msg.users_invalid_pwd)
-            return HttpResponseRedirect(reverse("users:signup"))
+        else:
+            try:
+                User.objects.validate_password(password)
+            except ValidationError:
+                messages.error(request, msg.users_signup_error)
+                messages.info(request, msg.users_invalid_pwd)
+                return HttpResponseRedirect(reverse("users:signup"))
               
-        ######
-        ### User Registration
+#       User Registration
         User.objects.create_user(username = username, email = email,
                                 password = password)
         
@@ -139,4 +130,47 @@ def signup(request):
         return HttpResponseRedirect(reverse("users:login"))
 
     return render(request, "users/signup.html")
+
+
+@login_required
+def personalinfo(request):
+    boardlist = Board.objects.all()
+    return render(request, "users/personalinfo.html", 
+            {'boardlist' : boardlist})
+
+@login_required
+def editpassword(request):
+    if request.method == 'POST':
+#       password
+        password = request.POST['pwd']
+#       check present password
+        if not request.user.check_password(password):
+            messages.error(request, msg.users_change_pwd_error)
+            messages.info(request, msg.users_pwd_not_correct)
+            return HttpResponseRedirect(reverse("users:editpwd"))
+
+#       check if new password is equal to new password confirmation
+        new_password = request.POST['confirm_new_pwd']
+        new_password_confirmation = request.POST['confirm_new_pwd']
+        
+        if new_password != new_password_confirmation:
+            messages.error(request, msg.users_change_pwd_error)
+            messages.info(request, msg.users_confirm_pwd_error)
+            return HttpResponseRedirect(reverse("users:editpwd"))
+        else:
+#       check if new password is valid            
+            try:
+                User.objects.validate_password(new_password)
+            except ValidationError:
+                messages.error(request, msg.users_change_pwd_error)
+                messages.info(request, msg.users_invalid_pwd)
+                return HttpResponseRedirect(reverse("users:editpwd"))
+
+#       set new password            
+        request.user.set_password(new_password)
+        _logout(request)
+        messages.success(request, msg.users_change_pwd_success)
+        messages.info(request, msg.users_change_pwd_success_info)
+        return HttpResponseRedirect(reverse("users:login")) 
+    return render(request, "users/editpwd.html")
 

@@ -1,9 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, request
+from django.http import HttpResponse, HttpResponseRedirect, request, Http404
 from boards.models import *
 from seeseehome import msg
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -15,12 +14,26 @@ def write(request, board_id, **extra_fields):
 #   django-ckform not used. 
 #   ckeditor widget class is used in template instead)
 #   form = WriteForm()
+
+#   for prevent the error "referenced before assignment"
+    #post_id = None
+
+#   board : argument for is_valid_writeperm
+    board = Board.objects.get_board(board_id)
+
+#   writer : argument for is_valid_writeperm
+    writer = User.objects.get_user(request.user.id)
+
+#   does the writer have valid write permission?
+    if not Post.objects.is_valid_writeperm(
+           board = board, writer = writer):
+        messages.error(request, msg.boards_write_error)
+        messages.info(request, msg.boards_writer_perm_error)
+        return HttpResponseRedirect(reverse("boards:boardpage", 
+            args=(board_id, 1)))
+
     if request.method == 'POST':
         is_valid_content = False
-
-#       board
-        board = Board.objects.get_board(board_id)
-
 #       subject
         subject = request.POST['subject']
         try:
@@ -49,26 +62,6 @@ def write(request, board_id, **extra_fields):
             else:
                 is_valid_content = True
 
-#       writer
-        try:
-            writer = User.objects.get_user(request.user.id)
-        except:
-            messages.error(request, msg.boards_write_error)
-            messages.info(request, msg.boards_anonymous_users_access) 
-            return HttpResponseRedirect(reverse("users:login"))
- 
-#       write permission check
-        if Post.objects.is_valid_perm(
-               boardperm = board.writeperm, 
-               userperm = writer.userperm
-           ):
-            is_valid_writer = True
-        else:
-            messages.error(request, msg.boards_write_error)
-            messages.info(request, msg.boards_writer_perm_error)
-            return HttpResponseRedirect(reverse("boards:write",
-                    args=(board_id)))
-
 #       post save
 #       If rewrite, no create, but update
         if not 'post_id' in extra_fields:
@@ -77,25 +70,23 @@ def write(request, board_id, **extra_fields):
 #       content save
             if is_valid_content:
                 Post.objects.update_post(post.id, content=content)
+
+            return HttpResponseRedirect(reverse("boards:postpage",
+                    args=(board_id, post.id)))
         else:
             post_id = extra_fields['post_id']
             Post.objects.update_post(post_id, subject=subject)
             if is_valid_content:
                 Post.objects.update_post(post_id, content=content)
 
-        messages.success(request, msg.boards_write_success)
-        messages.info(request, msg.boards_write_success_info)
+            messages.success(request, msg.boards_write_success)
+            messages.info(request, msg.boards_write_success_info)
+#           no need to HttpResponseRedirect, That is inplementeed in 
+#           rewrite mothod
 
-        boardposts = \
-            (BoardPosts.objects.filter(board=board)).order_by('-posted_date')
-        custom_paginator = pagination(
-                               boardposts=boardposts, 
-                               posts_per_page = 10
-                           )
-        return HttpResponseRedirect(reverse("boards:boardpage",
-            args=(board_id, 1)))
+    boardlist = Board.objects.all()
 
-    return render(request, "boards/write.html")
+    return render(request, "boards/write.html", {'boardlist' : boardlist})
 
 #@login_required
 def rewrite(request, board_id, post_id):
@@ -104,30 +95,53 @@ def rewrite(request, board_id, post_id):
     post = Post.objects.get_post(post_id) 
     
     if request.method == 'POST':
-        write(request, board_id, post_id=post.id)
+        write(request, board_id, post_id=post_id)
         boardposts = \
-            (BoardPosts.objects.filter(board=board)).order_by('-posted_date')
+            (BoardPosts.objects.filter(board=board)).order_by('-date_board_posts_created')
         custom_paginator = pagination(
                                boardposts=boardposts, 
                                posts_per_page = 10
                            )
-        return HttpResponseRedirect(reverse("boards:boardpage",
-            args=(board_id, 1)))
+        return HttpResponseRedirect(reverse("boards:postpage",
+            args=(board_id, post_id)))
+
+    boardlist = Board.objects.all()
 
     return render(request, "boards/rewrite.html",
-            {'board' : board, 'post' : post})
+            {'board' : board, 'post' : post, 'boardlist' : boardlist})
 
 def postpage(request, board_id, post_id):
     board = Board.objects.get_board(board_id)
     post = Post.objects.get_post(post_id) 
-    return render(request, "boards/postpage.html",
-            {'board' : board, 'post' : post})
 
-def pagination(boardposts, posts_per_page, page=1):
+    if request.method == "POST":
+        comment = request.POST['comment']
+        try:
+            Comment.objects.validate_comment(comment)        
+        except ValueError:
+            messages.error(request, msg.board_comment_error)
+            messages.info(request, msg.board_comment_must_be_set)
+        except ValidationError:
+            messages.error(request, msg.board_comment_error)
+            messages.info(request, msg.board_comment_at_most_255)
+        else:
+            Comment.objects.create_comment(
+                writer=request.user, board = board,
+                post = post, comment = comment
+            )
+    commentlist = \
+        Comment.objects.filter(post=post).order_by('-date_commented')
+
+    boardlist = Board.objects.all()
+    return render(request, "boards/postpage.html",
+            {'board' : board, 'post' : post, 'boardlist' : boardlist,
+                'commentlist' : commentlist})
+
+def pagination(boardposts, posts_per_page=10, page=1):
 #   posts per page
     start_pos = (int(page)-1) * posts_per_page
     end_pos = start_pos + posts_per_page
-    boardposts_per_page = boardposts[start_pos : end_pos]
+    boardposts_of_present_page = boardposts[start_pos : end_pos]
     paginator = Paginator(boardposts, posts_per_page).page(page)
     has_next = paginator.has_next()
     has_previous = paginator.has_previous()
@@ -139,7 +153,7 @@ def pagination(boardposts, posts_per_page, page=1):
         previous_page = paginator.previous_page_number()
 
     custom_paginator = {
-                               'boardposts' : boardposts_per_page,
+                               'boardposts' : boardposts_of_present_page,
                                'paginator' : paginator,
                                'has_next' : has_next,
                                'has_previous' : has_previous,
@@ -148,20 +162,40 @@ def pagination(boardposts, posts_per_page, page=1):
                            }
     return custom_paginator
 
-def boardpage(request, board_id, page):
-#   get board
+@login_required
+def boardpage(request, board_id, page=1):
+#   board : for is_valid_readperm
     board = Board.objects.get_board(board_id)
 
+#   reader : for is_valid_readperm
+    reader = User.objects.get_user(request.user.id)
 
-#   the following line is important to the page list (prev page, next page)
+#   Does the writer has valid write permission?
+    if not Board.objects.is_valid_readperm(
+           board = board, reader = reader):
+        messages.error(request, msg.boards_read_error)
+        messages.info(request, msg.boards_reader_perm_error)
+        return HttpResponseRedirect(reverse("home")) 
+
+#   The following line is important to the page list (prev page, next page)
     boardposts = \
-        (BoardPosts.objects.filter(board=board)).order_by('-posted_date')
-    custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
-                        page=page)
+        (BoardPosts.objects.filter(board=board)).order_by('-date_board_posts_created')
+
+#   if page does not exist, then raise 404
+    try:    
+        custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
+                            page=page)
+    except:
+        raise Http404
+
+#   for board list of menu bar
+    boardlist = Board.objects.all()
 
     return render(request, "boards/boardpage.html", 
                {
                    'board_id' : board_id,
+                   'board' : board,
+                   'boardlist' : boardlist,
                    'boardposts' : custom_paginator['boardposts'],
                    'paginator' :custom_paginator['paginator'],
                    'has_next' : custom_paginator['has_next'],
@@ -170,8 +204,4 @@ def boardpage(request, board_id, page):
                    'previous_page' : custom_paginator['previous_page'],
                }
            )
-
-def boardlist(request):
-    boardlist = Board.objects.all()
-    return render(request, "boards/boardlist.html", {'boardlist' : boardlist})
 

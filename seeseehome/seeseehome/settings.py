@@ -10,6 +10,15 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
+# exception message handling
+# when we are attempt to save a naive datetime, warning occurs
+# During development, such warnings into ignore status
+import warnings
+warnings.filterwarnings(
+        'ignore', r"DateTimeField .* received a naive datetime",
+        RuntimeWarning, r'django\.db\.models\.fields')
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
@@ -25,7 +34,8 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
-
+#ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+#ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -37,12 +47,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Django app
+#   Custom apps
     'users',
     'boards',
+    'linkboard',
 
-    # Python Package
+#   Django Packages
     'ckeditor',
+    'multiselectfield',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -75,7 +87,8 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+#TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 

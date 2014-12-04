@@ -1,8 +1,10 @@
+#-*- coding: utf-8 -*-
 from django.db import models
 from users.models import User
 #from posts.models import Post
 from seeseehome import msg
 from django.core.exceptions import ObjectDoesNotExist,ValidationError
+from multiselectfield import MultiSelectField
 
 class BoardManager(models.Manager):
 ##### CREATE
@@ -17,7 +19,8 @@ class BoardManager(models.Manager):
         return self._create_board(boardname)
 
     def validate_max_number_of_boards(self, num_of_boards):
-        if num_of_boards > 10:
+#       Number of Boards are already more than or equal to 10?        
+        if num_of_boards >= 10:
             raise ValidationError(msg.boards_max_number_of_boards)
         return True
 
@@ -28,6 +31,10 @@ class BoardManager(models.Manager):
             raise ValidationError(msg.boards_name_at_most_30)
         return True
 
+    def is_valid_readperm(self, board, reader):
+        return bool(str(board.readperm).find(reader.userperm) >= 1)
+
+
 ##########
 ##### RETRIEVE
     def get_board(self, id):
@@ -37,7 +44,7 @@ class BoardManager(models.Manager):
             return None
 
 ##########
-##### UPDATE
+##### UPDATE : This is only applied in admin page.
     def update_board(self, id, **extra_fields):
         board = Board.objects.get_board(id)
         if 'boardname' in extra_fields:
@@ -57,23 +64,42 @@ class Board(models.Model):
     objects = BoardManager()
 
     boardname = models.CharField(
-                    help_text = "Board subject",
+                    help_text = "Board name",
                     max_length = 255,
                     default = '',
                 )
 
-    readperm = models.IntegerField(
-                   help_text = "Read permission ( anonymous :0, user : 1, "
-                   "member : 2, coremember : 4, graduate : 8, "
-                   "president : 16, all : 31 )",
-                   default=msg.perm_all
+    """
+    * Warning : char field is set to unicode
+    """
+    readperm = MultiSelectField(
+                    help_text = ('Available Read Permission (It is possible'
+                    ' to select multiple[ User, Member, '
+                    'Core member, Graduate, President ]'),
+                    choices = (('1', 'User'), ('2', 'Member'), 
+                        ('3', 'Core member'), ('4', 'Graduate'), 
+                        ('5', 'President')),
+                    default = ['1','2','3','4','5'],
+                    max_length = 9,
+                    max_choices=5,
                )
-    writeperm = models.IntegerField(
-                    help_text = "Read permission ( anonymous :0, user : 1, "
-                    "member : 2, coremember : 4, graduate : 8, "
-                    "president : 16, all : 31 )",
-                    default=msg.perm_all
-                )
+                   
+    writeperm = MultiSelectField(
+                    help_text = ('Available Write Permission (It is possible'
+                    'to select multiple[ User, Member, '
+                    'Core member, Graduate, President ]'),
+                    choices = (('1', 'User'), ('2', 'Member'), 
+                        ('3', 'Core member'), ('4', 'Graduate'), 
+                        ('5', 'President')),
+                    default = ['1', '2', '3', '4', '5'],
+                    max_length = 9,
+                    max_choices=5,
+               )
+
+#   for showing user name instead of object itself in admin page
+    def __unicode__(self):
+       return 'Board name: ' + self.boardname
+ 
 
 class PostManager(models.Manager):
     ##### CREATE
@@ -90,9 +116,9 @@ class PostManager(models.Manager):
             is_valid_content = self.validate_content(content)
 
 #       writer
-        is_valid_writer = self.is_valid_perm(
-                              boardperm = board.writeperm, 
-                              userperm = writer.userperm
+        is_valid_writer = self.is_valid_writeperm(
+                              board = board, 
+                              writer = writer
                           )
         if not is_valid_writer:
             raise ValidationError(msg.boards_writer_perm_error)
@@ -110,7 +136,7 @@ class PostManager(models.Manager):
                              board = board,
                              post = post,
                          )
-        boardposts.save()
+        boardposts.save(using=self._db)
         return post
 
     def create_post(self, board, subject, writer, **extra_fields):
@@ -129,8 +155,15 @@ class PostManager(models.Manager):
        else:
             return True
 
-    def is_valid_perm(self, boardperm, userperm):
-        return bool(boardperm & userperm)
+    def is_valid_writeperm(self, board, writer):
+        return bool(str(board.writeperm).find(writer.userperm) >= 1)
+
+        """
+        Following code is more simple and operates well,
+        but it occurs some problems in the test codes
+        ( double wrapping of unicode & list )
+        """
+#        return bool(writer.userperm in board.writeperm)
 
     ##########
     ##### RETRIEVE
@@ -173,7 +206,15 @@ class Post(models.Model):
                 through_fields = ('post', 'board'),
                 related_name="posts_mtom"
             )
+
+#   It is used to show date posted in admin page 
+    date_posted = models.DateTimeField(db_index=True, auto_now_add=True, 
+            help_text = "It is used to show the date posted in admin page")
     
+#   for showing post information instead of object itself
+    def __unicode__(self):
+       return ('Writer: ' + self.writer.username + ", " +\
+                "Subject: " + self.subject)
 
 class BoardPostsManager(models.Manager):
     def _create_board_posts(self, board, post):
@@ -204,7 +245,95 @@ class BoardPosts(models.Model):
                Post,
                verbose_name = "post foreign key",
                related_name="post_foreignkey",
-            )    
+            )
 
-    posted_date = models.DateTimeField(db_index=True, auto_now_add=True)
+#  It is used to show data in orders in board page    
+    date_board_posts_created = \
+            models.DateTimeField(
+                db_index=True, auto_now_add=True,
+                help_text = "It is used to show data in orders in board page"
+            )
+
+class CommentManager(models.Manager):
+    ##### CREATE
+    def _create_comment(self, writer, board, post, comment):
+        is_valid_writer = False
+#       writer
+        is_valid_writer = Post.objects.is_valid_writeperm(
+                              board = board, 
+                              writer = writer
+                          )
+        if not is_valid_writer:
+            raise ValidationError(msg.boards_writer_perm_error)
+
+#       post
+        try:
+            post = Post.objects.get_post(post.id)
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(msg.board_comment_post_does_not_exist)
+
+#       board
+        try:
+            board = Board.objects.get_board(board.id)
+        except ObjectDoesNotExist:
+            raise ObjectDoesNotExist(msg.board_comment_board_does_not_exist)
+
+#       comment
+        self.validate_comment(comment)
+
+#       commentobject save
+        commentobject = self.model(writer=writer, post=post, board=board,
+                            comment=comment)
+        
+        commentobject.save(using=self._db)
+
+        return commentobject
+        
+    def create_comment(self, writer, board, post, comment):
+        return self._create_comment(writer=writer, board=board, post=post,
+                comment=comment)
+
+    def validate_comment(self, comment):
+        if not comment:
+            raise ValueError(msg.board_comment_must_be_set)
+        elif len(comment) > 255:
+            raise ValidationError(msg.board_comment_at_most_255)
+
+    ##########
+    ##### RETRIEVE
+    def get_comment(self, id):
+        try:
+            return Comment.objects.get(pk=id)
+        except Comment.DoesNotExist:
+            return None
+
+    ##########
+    ##### UPDATE
+    def update_comment(self, comment_id, **extra_fields):
+        commentobject = Comment.objects.get_comment(comment_id)
+        if 'comment' in extra_fields:
+            comment = extra_fields['comment']
+            self.validate_comment(comment)
+            commentobject.comment = comment
+
+        commentobject.save()
+
+class Comment(models.Model):
+    objects = CommentManager()
+    writer = models.ForeignKey(User)
+    board = models.ForeignKey(Board)
+    post = models.ForeignKey(Post)
+
+    comment = models.CharField(
+                  help_text = "Comment",
+                  max_length = 255,
+              )
+
+    date_commented = models.DateTimeField(db_index=True, auto_now_add=True, 
+            help_text = "It is used to show the date commented")
     
+#   for showing comment information instead of object itself
+    def __unicode__(self):
+       return ('Writer: ' + self.writer.username + ", " +\
+                "Comment: " + self.comment)
+

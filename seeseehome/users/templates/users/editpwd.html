@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Edit password</h2>
+  <form method="POST">{% csrf_token %}
+    <input name="pwd" type="password" placeholder="Enter Present Password" maxlength="255" class="basic_input" required autofocus>
+    <input name="new_pwd" type="password" placeholder="Enter New Password" maxlength="255" class="basic_input" required>
+    <input name="confirm_new_pwd" type="password" placeholder="Confirm Your New Password" maxlength="255" class="basic_input" required>
+    <input name="change_pwd_submit" type="submit" value="Change password">
+  </form>
+<a href="{% url 'home' %}">Main</a>
+{% endblock %}
+
