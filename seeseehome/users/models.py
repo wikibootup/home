@@ -1,3 +1,9 @@
+#-*- coding: utf-8 -*-
+# default encoding type : utf-8
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.validators import validate_email
@@ -38,8 +44,7 @@ class UserManager(BaseUserManager):
             raise ValueError(msg.users_name_must_be_set)
         elif len(username) > 30:
             raise ValidationError(msg.users_name_at_most_30)
-
-        if bool(re.match('^[a-zA-Z0-9_-]+$', username)) is False:
+        if bool(re.match('^[가-힣a-zA-Z0-9_-]+$', str(username))) is False:
             raise ValidationError(msg.users_invalid_name)    
  
     def validate_password(self, password):
