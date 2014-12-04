@@ -23,7 +23,11 @@ users_pwd_no_numeric_char = "User password must contain numeric character"
 users_pwd_no_alphabet_char = "User password must contain alphabet character"
 users_pwd_no_special_char = "User password must contain special character"
 
+### email
+users_email_already_exist = "The user E-mail already exist"
+
 ### username
+users_username_already_exist = "The user name already exist"
 users_name_must_be_set = "User name must be set"
 users_name_at_most_30 = "User name length is limited to 30.\n"
 users_invalid_name = "User name should be Korean Character (or Alphabet)\n" +\
@@ -107,11 +111,15 @@ boards_writer_perm_error = "You cannot write in this board ( pemission )"
 boards_read_error = "ERRROR : Read Error"
 boards_read_error_info = \
     "You don't have permission to access this board and read posts"
-baords_anonymous_user_read = \
-    "Only logged-in user can access this board and read posts"
-boards_reader_perm_error = \
+oards_reader_perm_error = \
     "You cannot access this board and read posts( pemission )"
 
+### comment
+board_comment_error = "ERROR : Comment Error"
+board_comment_must_be_set = "Comment must be set"
+board_comment_at_most_255 = "Comment max length : 255"
+board_comment_post_does_not_exist = "The Post does not exist"
+board_comment_board_does_not_exist = "The Board does not exist"
 
 #### linkboard
 linkboard_linkpost_invalid_writer_perm = \
@@ -124,4 +132,5 @@ linkboard_anonymous_user_read = \
 linkboard_linkpost_error = "ERROR : Link Post"
 linkboard_linkpost_invalid = "The URL is invalid"
 linkboard_linkpost_unicode_error = "The URL has invalid domain part"
+
 
