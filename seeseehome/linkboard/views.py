@@ -9,12 +9,62 @@ from django.core.paginator import Paginator
 from linkboard.models import LinkPost
 from users.models import User
 from boards.models import Board
+from django.core.validators import URLValidator
 
 @login_required
 def linkpost(request):
-    if request.method == 'POST':
-        pass
+#   writer
+    writer = request.user
+#   does the writer have valid write permission?
 
+    if not LinkPost.objects.is_valid_writeperm_to_linkpost(writer = writer):
+        messages.error(request, msg.boards_write_error)
+        messages.info(request, msg.boards_writer_perm_error)
+        return HttpResponseRedirect(
+                   reverse("linkboard:linkboardpage", args=(1,)))
+
+    if request.method == 'POST':
+#       url validator
+        try:
+            url = request.POST['url']
+            urlvalidator = URLValidator()
+            urlvalidator(url)
+        except ValidationError:
+            messages.error(self.request, msg.linkboard_linkpost_error)
+            messages.info(self.request, msg.linkboard_linkpost_invalid)
+            return HttpResponseRedirect(
+                       reverse("linkboard:linkboardpage", args=(1,)))
+
+
+        except UnicodeError:
+            messages.error(self.request, msg.linkboard_linkpost_error)
+            messages.info(self.request, msg.linkboard_linkpost_unicode_error)
+            return HttpResponseRedirect(
+                       reverse("linkboard:linkboardpage", args=(1,)))
+
+#       description validator
+        try:
+            description = request.POST['description']
+            LinkPost.objects.validate_description(description)
+        except ValueError:
+             messages.error(self.request, msg.linkboard_linkpost_error)
+             messages.info(self.request, msg.boards_linkpost_description)
+        except ValidationError:
+             messages.error(self.request, msg.linkboard_linkpost_error)
+             messages.info(
+                self.request, 
+                msg.boards_linkpost_description_at_most_255
+             )
+    
+#       create link post
+        LinkPost.objects.create_linkpost(
+            writer = writer, 
+            url = url, 
+            description=description
+        )
+        return HttpResponseRedirect(
+                  reverse("linkboard:linkboardpage", args=(1,)))
+  
     boardlist = Board.objects.all()
     return render(request, "linkboard/linkpost.html", {'boardlist':boardlist})
 
@@ -49,15 +99,6 @@ def pagination_of_linkboard(posts, posts_per_page=10, page=1):
 
 @login_required
 def linkboardpage(request, page=1):
-#   Read & Access permission 
-#   ( double validation for login, first : @login_required )
-    try:
-        reader = User.objects.get_user(request.user.id)
-    except:
-        messages.error(request, msg.linkboard_read_error)
-        messages.info(request, msg.linkboard_anonymous_user_read) 
-        return HttpResponseRedirect(reverse("users:login"))
-
     posts = LinkPost.objects.all().order_by('-date_posted')
     custom_paginator = pagination_of_linkboard(
                            posts=posts, 
@@ -69,7 +110,7 @@ def linkboardpage(request, page=1):
 
     return render(request, "linkboard/linkboardpage.html",
                {
-                   'posts' : posts,
+                   'posts' : custom_paginator['posts'],
                    'paginator' :custom_paginator['paginator'],
                    'has_next' : custom_paginator['has_next'],
                    'has_previous' : custom_paginator['has_previous'],
