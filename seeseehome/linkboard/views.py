@@ -10,6 +10,7 @@ from linkboard.models import LinkPost
 from users.models import User
 from boards.models import Board
 from django.core.validators import URLValidator
+from boards import views 
 
 @login_required
 def linkpost(request):
@@ -68,42 +69,13 @@ def linkpost(request):
     boardlist = Board.objects.all()
     return render(request, "linkboard/linkpost.html", {'boardlist':boardlist})
 
-
-
-def pagination_of_linkboard(posts, posts_per_page=10, page=1):
-#   posts per page
-    start_pos = (int(page)-1) * posts_per_page
-    end_pos = start_pos + posts_per_page
-    posts_of_present_page = posts[start_pos : end_pos]
-
-    paginator = Paginator(posts, posts_per_page).page(page)
-    has_next = paginator.has_next()
-    has_previous = paginator.has_previous()
-    nextpage = page
-    previous_page = page
-    if has_next:
-        nextpage = paginator.next_page_number()
-    if has_previous:
-        previous_page = paginator.previous_page_number()
-
-    custom_paginator = {
-                               'posts' : posts_of_present_page,
-                               'paginator' : paginator,
-                               'has_next' : has_next,
-                               'has_previous' : has_previous,
-                               'nextpage' : nextpage,
-                               'previous_page' : previous_page,
-                       }
-    return custom_paginator
-
-
 @login_required
 def linkboardpage(request, page=1):
     posts = LinkPost.objects.all().order_by('-date_posted')
 
 #   if the page does not exist, raise 404
     try:
-        custom_paginator = pagination_of_linkboard(
+        custom_paginator = views.pagination(
                                posts=posts, 
                                posts_per_page = 10,
                                page=page
