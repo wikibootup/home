@@ -1,5 +1,5 @@
 from django.contrib import admin
-from boards.models import Board, Post, BoardPosts
+from boards.models import *
 from boards.forms import BoardForm
 
 class BoardAdmin(admin.ModelAdmin):
