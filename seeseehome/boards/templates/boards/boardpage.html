@@ -33,21 +33,19 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th width="10%">#</th>
-                  <th width="60%">Subject</th>
+                  <th width="70%">Subject</th>
                   <th width="10%">Writer</th>
                   <th width="20%">Date posted</th>
                 </tr>
               </thead>
               <tbody>
 
-                {% if boardposts %}
-                 {% for boardpost in boardposts %}
+                {% if posts %}
+                 {% for post in posts %}
                    <tr>
-                     <td width="10%">#####</td>
-                     <td width="60%"><a href="{% url 'boards:postpage' board_id boardpost.post.id %}">{{ boardpost.post.subject }}</a></td>
-                     <td width="10%">{{ boardpost.post.writer.username }}</td>
-                     <td width="20%">{{ boardpost.post.date_posted }}</td>
+                     <td width="70%"><a href="{% url 'boards:postpage' board_id post.id %}">{{ post.subject }}</a></td>
+                     <td width="10%">{{ post.writer.username }}</td>
+                     <td width="20%">{{ post.date_posted }}</td>
                    </tr>
                  {% endfor %}  
                  {% endif %}
