@@ -33,8 +33,7 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th width="10%">#</th>
-                  <th width="60%">Description</th>
+                  <th width="70%">Description</th>
                   <th width="10%">Writer</th>
                   <th width="20%">Date posted</th>
                 </tr>
@@ -44,8 +43,7 @@
                 {% if posts %}
                  {% for post in posts %}
                    <tr>
-                     <td width="10%">#####</td>
-                     <td width="60%"><a href="{{post.url}}" target="_blank">{{ post.description }}</a></td>
+                     <td width="70%"><a href="{{post.url}}" target="_blank">{{ post.description }}</a></td>
                      <td width="10%">{{ post.writer.username }}</td>
                      <td width="20%">{{ post.date_posted }} </td>
                    </tr>
