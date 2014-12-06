@@ -51,7 +51,8 @@ def login(request):
             messages.info(request, msg.users_invalid)
             return HttpResponseRedirect(reverse("users:login"))
  
-    return render(request, "users/login.html")
+    boardlist = Board.objects.all()
+    return render(request, "users/login.html", {'boardlist' : boardlist})
 
 def logout(request):
     if request.user.__class__.__name__ is 'AnonymousUser':
@@ -65,6 +66,7 @@ def logout(request):
     return HttpResponseRedirect(reverse("home"))
 
 def signup(request):
+    is_contact_number = False
     ### username
     if request.method == 'POST':
         username = request.POST['username']
@@ -120,17 +122,33 @@ def signup(request):
                 messages.error(request, msg.users_signup_error)
                 messages.info(request, msg.users_invalid_pwd)
                 return HttpResponseRedirect(reverse("users:signup"))
-              
+        
+#       contact number
+        if 'contact_number' in request.POST:
+            contact_number = request.POST['contact_number']
+            print "ooooooo"
+            try:
+                User.objects.validate_contact_number(contact_number)
+            except ValidationError:
+                messages.error(request, msg.users_signup_error)
+                messages.info(request, msg.users_invalid_contact_number)
+            else:
+                is_contact_number = True
+
 #       User Registration
-        User.objects.create_user(username = username, email = email,
+        user = User.objects.create_user(username = username, email = email,
                                 password = password)
         
+        if is_contact_number:
+            print "gggggg"
+            User.objects.update_user(user.id, contact_number = contact_number)
+
         messages.success(request, msg.users_signup_success)
         messages.info(request, msg.users_signup_success_info)
         return HttpResponseRedirect(reverse("users:login"))
 
-    return render(request, "users/signup.html")
-
+    boardlist = Board.objects.all()
+    return render(request, "users/signup.html", {'boardlist' : boardlist})
 
 @login_required
 def personalinfo(request):
