@@ -34,6 +34,9 @@ users_invalid_name = "User name should be Korean Character (or Alphabet)\n" +\
                     "And it cannot contain special characters " + \
                     "except for under bar_ , hyphen -"
 
+### contact number
+users_invalid_contact_number = "Invalid contact number"
+
 ### update user
 users_update_without_any_required_fields = \
     "Possible update field : username, email"
