@@ -68,10 +68,14 @@ class UserManager(BaseUserManager):
         
         if bool(re.search('[a-zA-Z]', password)) is False:
             raise ValidationError(msg.users_pwd_no_alphabet_char)
-        
-        if bool(re.search('[$&+,:;=?@#|\'\"<>.^*()%!-]', password)) is False:
-            raise ValidationError(msg.users_pwd_no_special_char)
 
+        """
+#       regex for special characters may be added later
+        if bool(re.search(
+                   '[~`$&+,:;=?@#|\'\"<>.^*()%!-[]{},./?]', 
+                   password)) is False:
+            raise ValidationError(msg.users_pwd_no_special_char)
+        """
     def validate_userperm(self, userperm):
         if (userperm == 1) or (userperm == 2) or (userperm == 3) or \
             (userperm == 4) or (userperm == 5):
