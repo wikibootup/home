@@ -124,14 +124,15 @@ def signup(request):
                 return HttpResponseRedirect(reverse("users:signup"))
         
 #       contact number
-        if 'contact_number' in request.POST:
+        if ('contact_number' in request.POST) and \
+            (str(request.POST['contact_number']) != ""):
             contact_number = request.POST['contact_number']
-            print "ooooooo"
             try:
                 User.objects.validate_contact_number(contact_number)
             except ValidationError:
                 messages.error(request, msg.users_signup_error)
                 messages.info(request, msg.users_invalid_contact_number)
+                return HttpResponseRedirect(reverse("users:signup"))
             else:
                 is_contact_number = True
 
@@ -140,7 +141,6 @@ def signup(request):
                                 password = password)
         
         if is_contact_number:
-            print "gggggg"
             User.objects.update_user(user.id, contact_number = contact_number)
 
         messages.success(request, msg.users_signup_success)
