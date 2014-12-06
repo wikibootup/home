@@ -53,7 +53,8 @@ class UserManagerTestCase(TestCase):
             email = testdata.users_valid_email,
             password = testdata.users_pwd_without_alphabet_char,
         )
-
+    """
+#   regex or special characters may be added later    
     def test_user_password_without_special_char(self):
         self.assertRaises(
             ValidationError,
@@ -62,7 +63,7 @@ class UserManagerTestCase(TestCase):
             email = testdata.users_valid_email,
             password = testdata.users_pwd_without_special_char,
         )
-
+    """
     def test_user_password_under_6_char(self):
          self.assertRaises(
             ValidationError,
