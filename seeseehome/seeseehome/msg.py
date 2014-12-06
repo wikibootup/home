@@ -58,8 +58,7 @@ users_exist_name = "The user name already exist"
 users_invalid_pwd = \
     "Invalid password.\n" + \
     "password length is in range 6 ~ 255\n" + \
-    "And it should contain numeric character, alphabet character," + \
-    "and special character"
+    "And it should contain numeric character, alphabet character"
 users_confirm_pwd_error = \
     "Password you entered is different with password confirmation.\n" + \
     "Please check password" 
