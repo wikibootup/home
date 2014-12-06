@@ -2,5 +2,7 @@
 {% block content %}
   {% include 'menu.html' %}
   <div class="container">
+    {% load staticfiles %}
+    <img src="{% static 'img/13see.jpg' %}" style="width:100%">
   </div> <!-- /container -->
 {% endblock %}
