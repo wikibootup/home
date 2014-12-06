@@ -34,6 +34,7 @@ def write(request, board_id, **extra_fields):
 
     if request.method == 'POST':
         is_valid_content = False
+        is_notice = False
 #       subject
         subject = request.POST['subject']
         try:
@@ -62,23 +63,28 @@ def write(request, board_id, **extra_fields):
             else:
                 is_valid_content = True
 
+#       is_notice
+        if 'is_notice' in request.POST:
+            is_notice = request.POST['is_notice']
+
 #       post save
-#       If rewrite, no create, but update
         if not 'post_id' in extra_fields:
             post = Post.objects.create_post(board=board, subject=subject, 
-                    writer=writer)
+                    writer=writer, is_notice=is_notice)
 #       content save
             if is_valid_content:
                 Post.objects.update_post(post.id, content=content)
 
             return HttpResponseRedirect(reverse("boards:postpage",
                     args=(board_id, post.id)))
+#       If rewrite, no create, but update
         else:
             post_id = extra_fields['post_id']
             Post.objects.update_post(post_id, subject=subject)
             if is_valid_content:
-                Post.objects.update_post(post_id, content=content)
-
+                Post.objects.update_post(post_id, content=content,
+                    is_notice = is_notice)
+            
             messages.success(request, msg.boards_write_success)
             messages.info(request, msg.boards_write_success_info)
 #           no need to HttpResponseRedirect, That is inplementeed in 
@@ -178,9 +184,10 @@ def boardpage(request, board_id, page=1):
 #   The following line is important to the page list (prev page, next page)
     posts = Post.objects.filter(board=board).order_by("-date_posted")
     """
-    boardposts = \
-        (BoardPosts.objects.filter(board=board)).order_by('-date_board_posts_created')
+    All posts are listed in order by posted date.
+    But First of all, notice post will be listed.
     """
+    posts = posts.order_by("-is_notice")
 #   if page does not exist, then raise 404
     try:    
         custom_paginator = pagination(posts=posts, posts_per_page = 10,
