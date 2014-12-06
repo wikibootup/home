@@ -121,8 +121,6 @@ class PostManager(models.Manager):
         if not is_valid_writer:
             raise ValidationError(msg.boards_writer_perm_error)
 
-
-
 #       subject
         self.validate_subject(subject)
 
@@ -136,6 +134,12 @@ class PostManager(models.Manager):
         
         if is_valid_content:
             post.content = content
+
+#       is_notice
+        if 'is_notice' in extra_fields:
+            is_notice = extra_fields['is_notice']
+            if is_notice is True:
+                post.is_notice = True
 
         post.save(using=self._db)
         return post
@@ -182,6 +186,8 @@ class PostManager(models.Manager):
             post.subject = extra_fields['subject']
         if 'content' in extra_fields:
             post.content = extra_fields['content']
+        if 'is_notice' in extra_fields:
+            post.is_notice = extra_fields['is_notice']
 
         post.save()
 
@@ -204,7 +210,12 @@ class Post(models.Model):
 #   It is used to show date posted in admin page 
     date_posted = models.DateTimeField(db_index=True, auto_now_add=True, 
             help_text = "It is used to show the date posted in admin page")
-    
+   
+    is_notice = models.BooleanField(
+                    help_text = "Is this post a notice?",
+                    default=False
+                )
+
 #   for showing post information instead of object itself
     def __unicode__(self):
        return ('Writer: ' + self.writer.username + ", " +\
