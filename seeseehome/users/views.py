@@ -189,6 +189,8 @@ def editpassword(request):
         _logout(request)
         messages.success(request, msg.users_change_pwd_success)
         messages.info(request, msg.users_change_pwd_success_info)
-        return HttpResponseRedirect(reverse("users:login")) 
-    return render(request, "users/editpwd.html")
+        return HttpResponseRedirect(reverse("users:login"))
+
+    boardlist = Board.objects.all()
+    return render(request, "users/editpwd.html", {'boardlist' : boardlist})
 
