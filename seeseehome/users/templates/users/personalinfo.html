@@ -1,12 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 {% include "menu.html" %}
-  <h2>Personal info</h2>
 
-  <a href="{% url 'users:editpwd' %}">Edit password</a>
- 
-  {{ user.username }}<br>
-  {{ user.email }}
-  {{ user.contact_number }}
+<div style="padding:0px 15px;">
+  <h2>Personal info</h2>
+</div>
+  <address>
+    <label for="username_personalinfo" class="col-sm-2 control-label">User name</label>  {{ user.username }}<br><br>
+    <label for="email_personalinfo" class="col-sm-2 control-label">Email</label>  {{ user.email }}<br><br>
+    <label for="contact_number_personalinfo" class="col-sm-2 control-label">Contact number</label>  {{ user.contact_number }}<br><br>
+  </address>
+
+<div style="padding:0px 15px;">
+  <a class="btn btn-default" href="{% url 'users:editpwd' %}">Edit password</a>
+</div>
 {% endblock %}
 
