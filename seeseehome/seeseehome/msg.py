@@ -139,4 +139,8 @@ linkboard_linkpost_error = "ERROR : Link Post"
 linkboard_linkpost_invalid = "The URL is invalid"
 linkboard_linkpost_unicode_error = "The URL has invalid domain part"
 
+### delete comment
+boards_delete_comment_error = "ERROR : Delete Comment"
+boards_delete_auth_error = "You don't have permission to delete this comment"
+
 
