@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
   {% include 'menu.html' %}
-
+  {% load boards_custom_tags %}
 
     <div class="col-sm-3 col-md-2 sidebar">
       <ul class="nav nav-sidebar">
@@ -44,6 +44,9 @@
                        {% endif %}
                      </td>
                      <td width="65%"><a href="{% url 'boards:postpage' board_id post.id %}">{{ post.subject }}</a>
+                       {% if post|num_of_comments_in_post %}
+                         &nbsp;<font color="brown">{{ post|num_of_comments_in_post }}</font>
+                       {% endif %}
                     </td>
                      <td width="10%">{{ post.writer.username }}</td>
                      <td width="20%">{{ post.date_posted }}</td>
