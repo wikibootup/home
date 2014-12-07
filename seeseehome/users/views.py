@@ -157,6 +157,87 @@ def personalinfo(request):
             {'boardlist' : boardlist})
 
 @login_required
+def editpersonalinfo(request):
+
+    if request.method == 'POST':
+        username = request.POST['username']
+
+#       Is there difference in user name?        
+        if (request.user.username != username) and \
+          (str(username) != ""):
+#          username validator
+            try:
+                User.objects.validate_username(username)
+            except ValidationError:
+              messages.error(request, msg.users_editpersonalinfo_error)
+              messages.info(request, msg.users_invalid_name)
+              return HttpResponseRedirect(reverse("users:editpersonalinfo"))
+
+#           username unique check
+            try:
+                User.objects.get(username = username)
+            except ObjectDoesNotExist:
+                pass
+            else:
+                messages.error(request, msg.users_editpersonalinfo_error)
+                messages.info(request, msg.users_exist_name)
+                return HttpResponseRedirect(reverse("users:editpersonalinfo"))
+        
+            User.objects.update_user(
+                request.user.id, 
+                username = username
+            )
+           
+#       email
+        email = request.POST['email']
+#       Is there difference in email?
+        if (request.user.email != email) and ((str(email) != "")):
+            try:
+                validate_email(email)
+            except ValidationError:
+                messages.error(request, msg.users_editpersonalinfo_error)
+                messages.info(request, msg.users_invalid_email)
+                return HttpResponseRedirect(reverse("users:editpersonalinfo"))
+
+#           email unique check
+            try:
+                User.objects.get(email = email)
+            except ObjectDoesNotExist:
+                pass
+            else:
+                messages.error(request, msg.users_editpersonalinfo_error)
+                messages.info(request, msg.users_exist_email)
+                return HttpResponseRedirect(reverse("users:editpersonalinfo"))
+ 
+            User.objects.update_user(
+                request.user.id, 
+                email = email,
+            )
+
+#       contact number
+        contact_number = request.POST['contact_number']
+#       Is there difference in contact number
+        if (request.user.contact_number != contact_number) and \
+          ((str(contact_number) != "")):
+            try:
+                User.objects.validate_contact_number(contact_number)
+            except ValidationError:
+                messages.error(request, msg.users_editpersonalinfo_error)
+                messages.info(request, msg.users_invalid_contact_number)
+                return HttpResponseRedirect(reverse("users:editpersonalinfo"))
+            else:
+                User.objects.update_user(
+                    request.user.id, 
+                    contact_number = contact_number,
+                )
+        messages.success(request, msg.users_editpersonalinfo_success)
+        return HttpResponseRedirect(reverse("users:personalinfo"))
+
+    boardlist = Board.objects.all()
+    return render(request, "users/editpersonalinfo.html", 
+            {'boardlist' : boardlist})
+
+@login_required
 def editpassword(request):
     if request.method == 'POST':
 #       password
