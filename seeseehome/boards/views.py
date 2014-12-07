@@ -178,7 +178,7 @@ def boardpage(request, board_id, page=1):
     if not Board.objects.is_valid_readperm(
            board = board, reader = reader):
         messages.error(request, msg.boards_read_error)
-        messages.info(request, msg.boards_reader_perm_error)
+        messages.info(request, msg.boards_read_error_info)
         return HttpResponseRedirect(reverse("home")) 
 
 #   The following line is important to the page list (prev page, next page)
