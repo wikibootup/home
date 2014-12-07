@@ -212,3 +212,15 @@ def boardpage(request, board_id, page=1):
                }
            )
 
+@login_required
+def deletecomment(request, board_id, post_id, comment_id):
+    comment = Comment.objects.get_comment(comment_id)
+    if request.user != comment.writer:
+        messages.error(request, msg.boards_delete_comment_error)
+        messages.info(request, msg.boards_delete_auth_error)
+    else:
+        comment.delete()
+
+    return HttpResponseRedirect(reverse("boards:postpage", 
+      args=(board_id, post_id)))
+ 
