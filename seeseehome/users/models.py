@@ -96,9 +96,9 @@ class UserManager(BaseUserManager):
                 "User contact_number max length 30",
             )
 
-        if bool(re.match('^[0-9]+$', contact_number)) is False:
+        if bool(re.match('^[0-9-]+$', contact_number)) is False:
             raise ValidationError(
-                    "User contact_number should not be with character")
+                "contact number should be number, and '-' is only available")
 
 ##########
 ##### RETRIEVE
