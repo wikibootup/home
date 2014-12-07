@@ -138,7 +138,7 @@ class PostManager(models.Manager):
 #       is_notice
         if 'is_notice' in extra_fields:
             is_notice = extra_fields['is_notice']
-            if is_notice is True:
+            if is_notice =="option1":
                 post.is_notice = True
 
         post.save(using=self._db)
