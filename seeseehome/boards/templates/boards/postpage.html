@@ -59,18 +59,22 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th width="20%">Comment</th>
-                  <th width="10%">Commenter</th>
-                  <th width="20%">Date commented</th>
+                  <th width="30%">Comment</th>
+                  <th width="5%">Commenter</th>
+                  <th width="10%">Date commented</th>
+                  <th width="5%"></th>
                 </tr>
               </thead>
               <tbody>
                 {% if commentlist %}
                   {% for comment in commentlist %}
                     <tr>
-                      <td width="20%">{{ comment.comment }}</td>
-                      <td width="10%">{{ comment.writer.username }}</td>
-                      <td width="20%">{{ comment.date_commented }}</td>
+                      <td width="30%">{{ comment.comment }}</td>
+                      <td width="5%">{{ comment.writer.username }}</td>
+                      <td width="10%">{{ comment.date_commented }}</td>
+                      {% if post.writer == user %}
+                        <td width="5%"><div type="button" class="btn btn-default btn-xs"><a href="{% url 'boards:deletecomment' board.id post.id comment.id  %}">Delete</a></div></td>
+                      {% endif %}
                     </tr>
                   {% endfor %}  
                 {% endif %}
