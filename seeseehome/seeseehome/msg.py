@@ -8,6 +8,10 @@ perm_coremember = 3
 perm_graduate = 4
 perm_president = 5
 
+### edit personalinfo
+users_editpersonalinfo_error = "ERROR : Edit personal info"
+users_editpersonalinfo_success = "SUCCESS: Edit personal info"
+
 ### edit password
 users_change_pwd_error = "ERROR : Change Password"
 users_change_pwd_success = "SUCCESS : Change Password"
