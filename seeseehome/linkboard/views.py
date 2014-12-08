@@ -13,7 +13,7 @@ from django.core.validators import URLValidator
 from boards import views 
 
 @login_required
-def linkpost(request):
+def linkpost(request, **extra_fields):
 #   writer
     writer = request.user
 #   does the writer have valid write permission?
@@ -56,16 +56,26 @@ def linkpost(request):
                 request, 
                 msg.boards_linkpost_description_at_most_255
              )
-    
-#       create link post
-        LinkPost.objects.create_linkpost(
-            writer = writer, 
-            url = url, 
-            description=description
-        )
-        return HttpResponseRedirect(
-                  reverse("linkboard:linkboardpage", args=(1,)))
-  
+#       post save             
+        if not 'post_id' in extra_fields:
+#           create link post
+            LinkPost.objects.create_linkpost(
+                writer = writer, 
+                url = url, 
+                description=description
+            )
+            messages.success(request, msg.linkboard_linkpost_success)
+            return HttpResponseRedirect(
+                      reverse("linkboard:linkboardpage", args=(1,)))
+#       If rewrite, no create, but update            
+        else:
+            post_id = extra_fields['post_id']
+            LinkPost.objects.update_linkpost(linkpost_id=post_id, 
+                    url=url, description=description)
+            messages.success(request, msg.linkboard_linkpost_success)
+            return HttpResponseRedirect(
+                      reverse("linkboard:linkboardpage", args=(1,)))
+        
     boardlist = Board.objects.all()
     return render(request, "linkboard/linkpost.html", {'boardlist':boardlist})
 
@@ -111,4 +121,29 @@ def linkboardpage(request, page=1):
                    'boardlist' : boardlist,
                }
            )
+@login_required
+def updatelinkpost(request, post_id):
+    post = LinkPost.objects.get_linkpost(post_id)
+    if request.method == 'POST':
+        linkpost(request, post_id=post_id)
+        return HttpResponseRedirect(reverse("linkboard:linkboardpage", args=(1,)))
 
+    boardlist = Board.objects.all()
+
+    return render(request, "linkboard/updatelinkpost.html",
+            {'post' : post})
+
+
+@login_required
+def deletelinkpost(request, post_id):
+    linkpost = LinkPost.objects.get_linkpost(post_id)
+    print linkpost.writer
+    if request.user != linkpost.writer:
+        messages.error(request, msg.boards_delete_post_error)
+        messages.info(request, msg.boards_delete_post_auth_error)
+    else:
+        linkpost.delete()
+
+    return HttpResponseRedirect(reverse("linkboard:linkboardpage", args=(1,)))
+
+   
