@@ -92,7 +92,8 @@ def write(request, board_id, **extra_fields):
 
     boardlist = Board.objects.all()
 
-    return render(request, "boards/write.html", {'boardlist' : boardlist})
+    return render(request, "boards/write.html", {'boardlist' : boardlist,
+            'board' : board})
 
 #@login_required
 def rewrite(request, board_id, post_id):
@@ -183,6 +184,43 @@ def boardpage(request, board_id, page=1):
 
 #   The following line is important to the page list (prev page, next page)
     posts = Post.objects.filter(board=board).order_by("-date_posted")
+
+#   Caution : Following lines are implemented after ordering post data
+#   Is there a request method of post that searches specific posts?
+    if request.method == "POST":
+        search_post = request.POST['search_post']
+
+        if request.POST['select_post'] == "subject":
+            posts = posts.filter(subject__icontains = search_post)
+        elif request.POST['select_post'] == "content":
+            posts = posts.filter(content__icontains = search_post)
+        elif request.POST['select_post'] == "subject + content":
+            posts = posts.filter(subject__icontains = search_post) | \
+                    posts.filter(content__icontains = search_post)
+        elif request.POST['select_post'] == "writer":
+            try:
+                writer = User.objects.get(username = search_post)
+            except ObjectDoesNotExist:
+                messages.error(request, msg.boards_search_post_error)
+                messages.info(request, msg.users_username_does_not_exist)
+                return HttpResponseRedirect(reverse("boards:boardpage", 
+                    args=(board.id, 1)))
+            else:
+                posts = posts.filter(writer = writer)
+        
+        posts = posts[0:50]
+#       for board list of menu bar
+        boardlist = Board.objects.all()    
+        return render(request, "boards/boardpage.html",
+                   {
+                       'posts' : posts,
+                       'board' : board,
+                       'boardlist' : boardlist,
+                       'searchvalue' : search_post,
+                       'top50' : "Top 50 Search",
+                   }
+               )
+
     """
     All posts are listed in order by posted date.
     But First of all, notice post will be listed.
@@ -200,7 +238,6 @@ def boardpage(request, board_id, page=1):
 
     return render(request, "boards/boardpage.html", 
                {
-                   'board_id' : board_id,
                    'board' : board,
                    'boardlist' : boardlist,
                    'posts' : custom_paginator['posts'],
