@@ -111,7 +111,7 @@ class PostManager(models.Manager):
         try:
             Board.objects.get_board(board.id)
         except ObjectDoesNotExist:
-            raise ValidationError(msg.boards_board_arg_does_not_exist)
+            raise ValidationError(msg.boards_boards_arg_does_not_exist)
 
 #       writer
         is_valid_writer = self.is_valid_writeperm(
@@ -237,13 +237,13 @@ class CommentManager(models.Manager):
         try:
             post = Post.objects.get_post(post.id)
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(msg.board_comment_post_does_not_exist)
+            raise ObjectDoesNotExist(msg.boards_comment_post_does_not_exist)
 
 #       board
         try:
             board = Board.objects.get_board(board.id)
         except ObjectDoesNotExist:
-            raise ObjectDoesNotExist(msg.board_comment_board_does_not_exist)
+            raise ObjectDoesNotExist(msg.boards_comment_board_does_not_exist)
 
 #       comment
         self.validate_comment(comment)
@@ -262,9 +262,9 @@ class CommentManager(models.Manager):
 
     def validate_comment(self, comment):
         if not comment:
-            raise ValueError(msg.board_comment_must_be_set)
+            raise ValueError(msg.boards_comment_must_be_set)
         elif len(comment) > 255:
-            raise ValidationError(msg.board_comment_at_most_255)
+            raise ValidationError(msg.boards_comment_at_most_255)
 
     ##########
     ##### RETRIEVE
