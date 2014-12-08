@@ -3,38 +3,40 @@
   {% include 'menu.html' %}
 
 
-        <div class="col-sm-3 col-md-2 sidebar">
-          <ul class="nav nav-sidebar">
-          </ul>
-          <ul class="nav nav-sidebar">
-            <li class="active"><a href="{% url 'linkboard:linkpost' %}">Link Post<span class="sr-only">(current)</span></a></li>
- 
-            <li><a href="">Nav item</a></li>
-            <li><a href="">Nav item again</a></li>
-            <li><a href="">One more nav</a></li>
-            <li><a href="">Another nav item</a></li>
-            <li><a href="">More navigation</a></li>
-          </ul>
-          <ul class="nav nav-sidebar">
-            <li><a href="">Nav item again</a></li>
-            <li><a href="">One more nav</a></li>
-            <li><a href="">Another nav item</a></li>
-          </ul>
-        </div>
+    <div class="col-sm-3 col-md-2 sidebar">
+      <ul class="nav nav-sidebar">
+      </ul>
+      <ul class="nav nav-sidebar">
+        <li class="active"><a href="{% url 'linkboard:linkpost' %}">Link Post<span class="sr-only">(current)</span></a></li>
+        {% if has_previous %}
+          <li><a href="{% url 'linkboard:linkboardpage' previous_page %}">Prev</a></li>
+        {% endif %}
+        <li><a href="">Go to board</a><span class="sr-only">(current)</span></li>
+    
+        {% if has_next %}
+          <li><a href="{% url 'linkboard:linkboardpage' nextpage %}">Next</a></li>
+        {% endif %}
 
-
-
+        <form action="" method="POST">{% csrf_token %}
+          <li><input class="form-control" type="text" name="search_description" placeholder="Search Description"></li>
+        </form>
+    </div>
     <div class="container-fluid">
       <div class="row">
        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-         <h1 class="page-header">{{ board.boardname }}</h1>
+         <h1 class="page-header">Link board
+           {% if top50 and searchvalue %}
+             {{ top50 }} : "{{searchvalue}}" 
+           {% endif %}
+         </h1>
 
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th width="10%">#</th>
                   <th width="60%">Description</th>
+                  <th width="5%"></th>
+                  <th width="5%"></th>
                   <th width="10%">Writer</th>
                   <th width="20%">Date posted</th>
                 </tr>
@@ -44,8 +46,17 @@
                 {% if posts %}
                  {% for post in posts %}
                    <tr>
-                     <td width="10%">#####</td>
                      <td width="60%"><a href="{{post.url}}" target="_blank">{{ post.description }}</a></td>
+                       {% if post.writer == user %}
+                         <p>
+                         <th width="5%">
+                           <button type="button" class="btn btn-default btn-xs"><a href="{% url 'linkboard:updatelinkpost' post.id %}">Rewrite</a></button>
+                         </th>
+                         <th width="5%">
+                           <button type="button" class="btn btn-danger btn-xs"><a href="{% url 'linkboard:deletelinkpost' post.id %}">Delete</a></button>
+                         </th>
+                       </p>
+                       {% endif %}
                      <td width="10%">{{ post.writer.username }}</td>
                      <td width="20%">{{ post.date_posted }} </td>
                    </tr>

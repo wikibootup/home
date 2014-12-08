@@ -38,7 +38,24 @@ class LinkPostManager(models.Manager):
 #       linkboard is allowed who has the permission equal or higher than 'user'
         return bool(reader.userperm >= testdata.perm_user)
 
+##########
+##### RETRIEVE
+    def get_linkpost(self, id):
+        try:
+            return LinkPost.objects.get(pk=id)
+        except LinkPost.DoesNotExist:
+            return None
 
+##########
+##### UPDATE
+    def update_linkpost(self, linkpost_id, **extra_fields):
+        linkpost = LinkPost.objects.get_linkpost(linkpost_id)
+        if 'url' in extra_fields:
+            linkpost.url = extra_fields['url']
+        if 'description' in extra_fields:
+            linkpost.description = extra_fields['description']
+
+        linkpost.save()
 
 class LinkPost(models.Model):
     objects = LinkPostManager()

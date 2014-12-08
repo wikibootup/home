@@ -34,6 +34,7 @@ def write(request, board_id, **extra_fields):
 
     if request.method == 'POST':
         is_valid_content = False
+        is_notice = False
 #       subject
         subject = request.POST['subject']
         try:
@@ -62,23 +63,28 @@ def write(request, board_id, **extra_fields):
             else:
                 is_valid_content = True
 
+#       is_notice
+        if 'is_notice' in request.POST:
+            is_notice = request.POST['is_notice']
+
 #       post save
-#       If rewrite, no create, but update
         if not 'post_id' in extra_fields:
             post = Post.objects.create_post(board=board, subject=subject, 
-                    writer=writer)
-#       content save
+                    writer=writer, is_notice=is_notice)
+#           content save
             if is_valid_content:
                 Post.objects.update_post(post.id, content=content)
 
             return HttpResponseRedirect(reverse("boards:postpage",
                     args=(board_id, post.id)))
+#       If rewrite, no create, but update
         else:
             post_id = extra_fields['post_id']
             Post.objects.update_post(post_id, subject=subject)
             if is_valid_content:
-                Post.objects.update_post(post_id, content=content)
-
+                Post.objects.update_post(post_id, content=content,
+                    is_notice = is_notice)
+            
             messages.success(request, msg.boards_write_success)
             messages.info(request, msg.boards_write_success_info)
 #           no need to HttpResponseRedirect, That is inplementeed in 
@@ -91,17 +97,13 @@ def write(request, board_id, **extra_fields):
 #@login_required
 def rewrite(request, board_id, post_id):
     board = Board.objects.get_board(board_id)
-    boardposts = BoardPosts.objects.filter(board=board)
+#    boardposts = BoardPosts.objects.filter(board=board)
     post = Post.objects.get_post(post_id) 
+    posts = Post.objects.filter(board=board)
     
     if request.method == 'POST':
         write(request, board_id, post_id=post_id)
-        boardposts = \
-            (BoardPosts.objects.filter(board=board)).order_by('-date_board_posts_created')
-        custom_paginator = pagination(
-                               boardposts=boardposts, 
-                               posts_per_page = 10
-                           )
+        posts = Post.objects.filter(board=board).order_by("-date_posted")
         return HttpResponseRedirect(reverse("boards:postpage",
             args=(board_id, post_id)))
 
@@ -137,12 +139,13 @@ def postpage(request, board_id, post_id):
             {'board' : board, 'post' : post, 'boardlist' : boardlist,
                 'commentlist' : commentlist})
 
-def pagination(boardposts, posts_per_page=10, page=1):
+def pagination(posts, posts_per_page=10, page=1):
 #   posts per page
     start_pos = (int(page)-1) * posts_per_page
     end_pos = start_pos + posts_per_page
-    boardposts_of_present_page = boardposts[start_pos : end_pos]
-    paginator = Paginator(boardposts, posts_per_page).page(page)
+    posts_of_present_page = posts[start_pos : end_pos]
+
+    paginator = Paginator(posts, posts_per_page).page(page)
     has_next = paginator.has_next()
     has_previous = paginator.has_previous()
     nextpage = page
@@ -153,14 +156,15 @@ def pagination(boardposts, posts_per_page=10, page=1):
         previous_page = paginator.previous_page_number()
 
     custom_paginator = {
-                               'boardposts' : boardposts_of_present_page,
+                               'posts' : posts_of_present_page,
                                'paginator' : paginator,
                                'has_next' : has_next,
                                'has_previous' : has_previous,
                                'nextpage' : nextpage,
                                'previous_page' : previous_page,
-                           }
+                       }
     return custom_paginator
+
 
 @login_required
 def boardpage(request, board_id, page=1):
@@ -174,16 +178,19 @@ def boardpage(request, board_id, page=1):
     if not Board.objects.is_valid_readperm(
            board = board, reader = reader):
         messages.error(request, msg.boards_read_error)
-        messages.info(request, msg.boards_reader_perm_error)
+        messages.info(request, msg.boards_read_error_info)
         return HttpResponseRedirect(reverse("home")) 
 
 #   The following line is important to the page list (prev page, next page)
-    boardposts = \
-        (BoardPosts.objects.filter(board=board)).order_by('-date_board_posts_created')
-
+    posts = Post.objects.filter(board=board).order_by("-date_posted")
+    """
+    All posts are listed in order by posted date.
+    But First of all, notice post will be listed.
+    """
+    posts = posts.order_by("-is_notice")
 #   if page does not exist, then raise 404
     try:    
-        custom_paginator = pagination(boardposts=boardposts, posts_per_page = 10,
+        custom_paginator = pagination(posts=posts, posts_per_page = 10,
                             page=page)
     except:
         raise Http404
@@ -196,7 +203,7 @@ def boardpage(request, board_id, page=1):
                    'board_id' : board_id,
                    'board' : board,
                    'boardlist' : boardlist,
-                   'boardposts' : custom_paginator['boardposts'],
+                   'posts' : custom_paginator['posts'],
                    'paginator' :custom_paginator['paginator'],
                    'has_next' : custom_paginator['has_next'],
                    'has_previous' : custom_paginator['has_previous'],
@@ -204,4 +211,29 @@ def boardpage(request, board_id, page=1):
                    'previous_page' : custom_paginator['previous_page'],
                }
            )
+
+@login_required
+def deletecomment(request, board_id, post_id, comment_id):
+    comment = Comment.objects.get_comment(comment_id)
+    if request.user != comment.writer:
+        messages.error(request, msg.boards_delete_comment_error)
+        messages.info(request, msg.boards_delete_comment_auth_error)
+    else:
+        comment.delete()
+
+    return HttpResponseRedirect(reverse("boards:postpage", 
+      args=(board_id, post_id)))
+
+@login_required
+def deletepost(request, board_id, post_id):
+    post = Post.objects.get_post(post_id)
+    
+    if request.user != post.writer:
+        messages.error(request, msg.boards_delete_post_error)
+        messages.info(request, msg.boards_delete_post_auth_error)
+    else:
+        post.delete()
+    
+    return HttpResponseRedirect(reverse("boards:boardpage", 
+      args=(board_id, 1)))
 

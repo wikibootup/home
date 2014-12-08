@@ -18,14 +18,20 @@ class UserManager(BaseUserManager):
         is_admin=False, **extra_fields):
         """ 
         It Creates and saves a User with the given username, email and 
-        password.
+        password, and values in extra fields.
         """
         self.validate_username(username)
         email = self.normalize_email(email)
         validate_email(email)
         self.validate_password(password)
-
+        
         user = self.model(username=username, email=email, is_admin=is_admin)
+
+        if 'contact_number' in extra_fields:
+            contact_number = extra_fields['contact_number']
+            self.validate_contact_number(contact_number)
+            user.contact_number = contact_number
+
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -62,10 +68,14 @@ class UserManager(BaseUserManager):
         
         if bool(re.search('[a-zA-Z]', password)) is False:
             raise ValidationError(msg.users_pwd_no_alphabet_char)
-        
-        if bool(re.search('[$&+,:;=?@#|\'\"<>.^*()%!-]', password)) is False:
-            raise ValidationError(msg.users_pwd_no_special_char)
 
+        """
+#       regex for special characters may be added later
+        if bool(re.search(
+                   '[~`$&+,:;=?@#|\'\"<>.^*()%!-[]{},./?]', 
+                   password)) is False:
+            raise ValidationError(msg.users_pwd_no_special_char)
+        """
     def validate_userperm(self, userperm):
         if (userperm == 1) or (userperm == 2) or (userperm == 3) or \
             (userperm == 4) or (userperm == 5):
@@ -74,6 +84,21 @@ class UserManager(BaseUserManager):
             raise ValidationError(
                 msg.users_userperm_validation_error,
             )
+
+    def validate_contact_number(self, contact_number):
+
+        if len(contact_number) < 8:
+            raise ValidationError(
+                "User contact_number length should be at least 8",
+            )
+        elif len(contact_number) > 30:
+            raise ValidationError(
+                "User contact_number max length 30",
+            )
+
+        if bool(re.match('^[0-9-]+$', contact_number)) is False:
+            raise ValidationError(
+                "contact number should be number, and '-' is only available")
 
 ##########
 ##### RETRIEVE
@@ -103,6 +128,11 @@ class UserManager(BaseUserManager):
                 user.email = extra_fields['email']
             else:
                 raise ValidationError(msg.users_email_already_exist)
+
+        if 'contact_number' in extra_fields:
+            contact_number = extra_fields['contact_number']
+            self.validate_contact_number(contact_number)
+            user.contact_number = contact_number
 
         if 'userperm' in extra_fields:
             self.validate_userperm(extra_fields['userperm'])
@@ -138,14 +168,17 @@ class User(AbstractBaseUser):
                help_text = "User name",
                max_length = 30,
                unique = True,
-               default = '',
            )
     email = models.EmailField(
                 help_text = "User email",
                 max_length = 64,
                 unique = True,
-                default = '',
             ) 
+
+    contact_number = models.CharField(
+                      help_text = "User Contact Number",
+                      max_length=30,
+                  )
 
     is_active = models.BooleanField(
                     help_text = "Is active user?",

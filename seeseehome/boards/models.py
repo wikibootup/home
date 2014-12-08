@@ -103,17 +103,15 @@ class Board(models.Model):
 
 class PostManager(models.Manager):
     ##### CREATE
-    def _create_post(self, board, subject, writer, **extra_fields):
+    def _create_post(self, board, writer, subject, **extra_fields):
         is_valid_content = False
         is_valid_writer = False
 
-#       subject
-        self.validate_subject(subject)
-
-#       content
-        if 'content' in extra_fields:
-            content = extra_fields['content']
-            is_valid_content = self.validate_content(content)
+#       board
+        try:
+            Board.objects.get_board(board.id)
+        except ObjectDoesNotExist:
+            raise ValidationError(msg.boards_board_arg_does_not_exist)
 
 #       writer
         is_valid_writer = self.is_valid_writeperm(
@@ -123,20 +121,27 @@ class PostManager(models.Manager):
         if not is_valid_writer:
             raise ValidationError(msg.boards_writer_perm_error)
 
+#       subject
+        self.validate_subject(subject)
+
+#       content
+        if 'content' in extra_fields:
+            content = extra_fields['content']
+            is_valid_content = self.validate_content(content)
+
 #       post save ( caution : board is not parameter for post model )
-        post = self.model(subject=subject, writer=writer)
+        post = self.model(board=board, writer=writer, subject=subject)
         
         if is_valid_content:
             post.content = content
 
+#       is_notice
+        if 'is_notice' in extra_fields:
+            is_notice = extra_fields['is_notice']
+            if is_notice =="option1":
+                post.is_notice = True
+
         post.save(using=self._db)
-             
-        # create a relationship between board & post
-        boardposts = BoardPosts.objects.create_board_posts(
-                             board = board,
-                             post = post,
-                         )
-        boardposts.save(using=self._db)
         return post
 
     def create_post(self, board, subject, writer, **extra_fields):
@@ -181,12 +186,15 @@ class PostManager(models.Manager):
             post.subject = extra_fields['subject']
         if 'content' in extra_fields:
             post.content = extra_fields['content']
+        if 'is_notice' in extra_fields:
+            post.is_notice = extra_fields['is_notice']
 
         post.save()
 
 class Post(models.Model):
     objects = PostManager()
     writer = models.ForeignKey(User)
+    board = models.ForeignKey(Board)
     subject = models.CharField(
                   help_text = "Post subject",
                   max_length = 255,
@@ -198,61 +206,20 @@ class Post(models.Model):
                   max_length = 65535,
                   default = '',
               )
-    
-    posts = models.ManyToManyField(
-                Board,
-                verbose_name = "board posts of many to many field",
-                through = 'BoardPosts',
-                through_fields = ('post', 'board'),
-                related_name="posts_mtom"
-            )
 
 #   It is used to show date posted in admin page 
     date_posted = models.DateTimeField(db_index=True, auto_now_add=True, 
             help_text = "It is used to show the date posted in admin page")
-    
+   
+    is_notice = models.BooleanField(
+                    help_text = "Is this post a notice?",
+                    default=False
+                )
+
 #   for showing post information instead of object itself
     def __unicode__(self):
        return ('Writer: ' + self.writer.username + ", " +\
                 "Subject: " + self.subject)
-
-class BoardPostsManager(models.Manager):
-    def _create_board_posts(self, board, post):
-        # The precise validator for This method is not implemented.
-        # This method should be called in create_post method.
-        if board.__class__.__name__ is not "Board":
-            raise ValidationError(msg.boards_board_arg_error)
-        if post.__class__.__name__ is not "Post":
-            raise ValidationError(msg.boards_post_arg_err)
-
-        board_posts = self.model(board=board, post=post)
-        board_posts.save(using=self._db)
-        return board_posts
-
-    def create_board_posts(self, board, post):
-        return self._create_board_posts(board, post)
-
-class BoardPosts(models.Model):
-    objects = BoardPostsManager()
-    
-    board = models.ForeignKey(
-                Board,
-                verbose_name = "board foreign key",
-                related_name="board_foreignkey",
-            )
-
-    post = models.ForeignKey(
-               Post,
-               verbose_name = "post foreign key",
-               related_name="post_foreignkey",
-            )
-
-#  It is used to show data in orders in board page    
-    date_board_posts_created = \
-            models.DateTimeField(
-                db_index=True, auto_now_add=True,
-                help_text = "It is used to show data in orders in board page"
-            )
 
 class CommentManager(models.Manager):
     ##### CREATE

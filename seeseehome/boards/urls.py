@@ -8,4 +8,11 @@ urlpatterns = patterns('',
     url(r'^boards/([0-9]+)/post/$', 'boards.views.write', name="write"),
     url(r'^boards/([0-9]+)/post/([0-9]+)/rewrite/', 'boards.views.rewrite', 
         name="rewrite"),
+    url(r'^boards/([0-9]+)/post/([0-9]+)/comment/([0-9]+)/delete/$', 
+        'boards.views.deletecomment', name="deletecomment"),
+    url(r'^boards/([0-9]+)/post/([0-9]+)/$', 'boards.views.postpage', 
+        name="postpage"),
+    url(r'^boards/([0-9]+)/post/([0-9]+)/delete/$', 
+        'boards.views.deletepost', name="deletepost"),
+
 ) 

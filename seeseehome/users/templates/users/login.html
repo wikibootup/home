@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+  {% include 'menu.html' %} 
   <!-- Custom styles for this template -->
-
     <div class="container">
-
       <form class="form-signin" role="form" method="POST">{% csrf_token %}
         <h2 class="form-signin-heading">Log in</h2>
           {% if next %}
@@ -14,17 +13,10 @@
               <input name="username" type="text" id="inputEmail" class="form-control" placeholder="Enter User name or Email" maxlength="64" required autofocus>
               <label for="inputPassword" class="sr-only">Password</label>
               <input name="pwd" type="password" id="inputPassword" class="form-control" placeholder="Enter Password" maxlength="255" required>
- 
               <input class="btn btn-lg btn-primary btn-block" name="login_submit" type="submit" value="Log in"></input>
- 
             </form>
           {% endif %}
       </form>
-
     </div> <!-- /container -->
-
-  <a href="{% url 'users:signup' %}">Sign up</a>
-  <a href="{% url 'home' %}">Main</a>
-
 {% endblock %}
 

@@ -10,10 +10,10 @@ class UserAdmin(admin.ModelAdmin):
         return False
 
     form = UserForm
-    list_display = ('username', 'email',)
+    list_display = ('username', 'email', 'contact_number')
 #   admin does not have edit following fields
     exclude = ('password', 'username', 'email', 
-                'last_login',)
+                'last_login', 'contact_number')
     search_fields = ['username', 'users__email']
 
 

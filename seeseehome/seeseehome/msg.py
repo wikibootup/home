@@ -8,6 +8,10 @@ perm_coremember = 3
 perm_graduate = 4
 perm_president = 5
 
+### edit personalinfo
+users_editpersonalinfo_error = "ERROR : Edit personal info"
+users_editpersonalinfo_success = "SUCCESS: Edit personal info"
+
 ### edit password
 users_change_pwd_error = "ERROR : Change Password"
 users_change_pwd_success = "SUCCESS : Change Password"
@@ -34,6 +38,9 @@ users_invalid_name = "User name should be Korean Character (or Alphabet)\n" +\
                     "And it cannot contain special characters " + \
                     "except for under bar_ , hyphen -"
 
+### contact number
+users_invalid_contact_number = "Invalid contact number"
+
 ### update user
 users_update_without_any_required_fields = \
     "Possible update field : username, email"
@@ -55,8 +62,7 @@ users_exist_name = "The user name already exist"
 users_invalid_pwd = \
     "Invalid password.\n" + \
     "password length is in range 6 ~ 255\n" + \
-    "And it should contain numeric character, alphabet character," + \
-    "and special character"
+    "And it should contain numeric character, alphabet character"
 users_confirm_pwd_error = \
     "Password you entered is different with password confirmation.\n" + \
     "Please check password" 
@@ -129,8 +135,19 @@ linkboard_anonymous_user_read = \
     "Only logged-in user can access this board and read posts"
 
 ### linkpost
+linkboard_linkpost_success = "SUCCESS : Link Post"
 linkboard_linkpost_error = "ERROR : Link Post"
 linkboard_linkpost_invalid = "The URL is invalid"
 linkboard_linkpost_unicode_error = "The URL has invalid domain part"
+
+### delete comment
+boards_delete_comment_error = "ERROR : Delete Comment"
+boards_delete_comment_auth_error = \
+    "You don't have permission to delete this comment"
+
+boards_delete_post_error = "ERROR : Delete Post"
+boards_delete_post_auth_error = \
+    "You don't have permission to delete this post"
+
 
 

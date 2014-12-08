@@ -53,7 +53,8 @@ class UserManagerTestCase(TestCase):
             email = testdata.users_valid_email,
             password = testdata.users_pwd_without_alphabet_char,
         )
-
+    """
+#   regex or special characters may be added later    
     def test_user_password_without_special_char(self):
         self.assertRaises(
             ValidationError,
@@ -62,7 +63,7 @@ class UserManagerTestCase(TestCase):
             email = testdata.users_valid_email,
             password = testdata.users_pwd_without_special_char,
         )
-
+    """
     def test_user_password_under_6_char(self):
          self.assertRaises(
             ValidationError,
@@ -151,7 +152,18 @@ class UserManagerTestCase(TestCase):
         updated_user = User.objects.get_user(user.id)
         self.assertEqual(updated_user.userperm, "5")
  
-
+    def test_update_contact_number(self):
+        user = User.objects.create_user(
+                   username = testdata.users_old_name,
+                   email = testdata.users_valid_email,
+                   password = testdata.users_valid_password,
+               )
+        self.assertEqual(user.username, testdata.users_old_name)
+        User.objects.update_user(user.id, 
+                contact_number = testdata.users_contact_number)
+        updated_user = User.objects.get_user(user.id)
+        self.assertEqual(updated_user.contact_number, 
+                testdata.users_contact_number)
 
 ##########
 ##### DELETE

@@ -26,6 +26,7 @@ users_old_name = "OldName1233-_"
 users_new_name = "NewName1234-_"
 users_name_with_special_char = "NewName1234!@#$"
 users_new_over_length_name = "a" * 31
+users_contact_number = "010-0000-0000"
 # The following email is not sign-in yet
 users_valid_name = "Available_-123User-Name"
 users_invalid_name_exceed_the_maximum = "a" * 31

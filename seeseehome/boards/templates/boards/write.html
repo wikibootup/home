@@ -1,13 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
 {% include "menu.html" %}
-<h2>Write</h2>
+<div style="padding:0px 15px;">
+  <h2>Write</h2>
+</div>
   <form method="POST">{% csrf_token %}
-    <input name="subject" type="text" placeholder="Enter Subject" maxlength="255" onkeydown="if (event.keyCode == 13) {return false;}" required autofocus>
-    <p> <div class="django-ckeditor-widget" data-field-id="id_content" style="display: inline-block;">
-    <textarea cols="40" id="id_content" maxlength="65535" name="content" rows="10" data-processed="0" data-config='{"filebrowserWindowWidth": 940, "toolbar_Basic": [["Source", "-", "Bold", "Italic"]], "language": "en-us", "toolbar_Full": [["Styles", "Format", "Bold", "Italic", "Underline", "Strike", "SpellChecker", "Undo", "Redo"], ["Image", "Flash", "Table", "HorizontalRule"], ["TextColor", "BGColor"], ["Smiley", "SpecialChar"], ["Source"]], "filebrowserUploadUrl": "/ckeditor/upload/", "height": 291, "width": 835, "filebrowserBrowseUrl": "/ckeditor/browse/", "skin": "moono", "filebrowserWindowHeight": 725, "toolbar": "Full"}' data-id="id_content" data-type="ckeditortype"></textarea>
+    <div class="col-xs-4">
+      <input class="form-control" name="subject" type="text" placeholder="Enter Subject" maxlength="255" onkeydown="if (event.keyCode == 13) {return false;}" required autofocus>
+    </div>
+  
+      <label class="checkbox-inline">
+        <input type='checkbox' id="inlineCheckbox1" value="option1" name='is_notice'> Is notice?
+      </label><br><br>
+    <div style="padding:0px 15px;">
+      <p><div class="django-ckeditor-widget" data-field-id="id_content" style="display: inline-block;">
+        <textarea cols="40" id="id_content" maxlength="65535" name="content" rows="10" data-processed="0" data-config='{"filebrowserWindowWidth": 940, "toolbar_Basic": [["Source", "-", "Bold", "Italic"]], "language": "en-us", "toolbar_Full": [["Styles", "Format", "Bold", "Italic", "Underline", "Strike", "SpellChecker", "Undo", "Redo"], ["Image", "Flash", "Table", "HorizontalRule"], ["TextColor", "BGColor"], ["Smiley", "SpecialChar"], ["Source"]], "filebrowserUploadUrl": "/ckeditor/upload/", "height": 291, "width": 835, "filebrowserBrowseUrl": "/ckeditor/browse/", "skin": "moono", "filebrowserWindowHeight": 725, "toolbar": "Full"}' data-id="id_content" data-type="ckeditortype"></textarea>
+  </div></p>
     <input name="post" type="submit" value="POST">
   </form>
-<br><a href="{% url 'home' %}">Main</a>
+</div>
 {% endblock %}
 
