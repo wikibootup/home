@@ -8,12 +8,24 @@
       </ul>
       <ul class="nav nav-sidebar">
         <li class="active"><a href="{% url 'boards:write' board.id %}">Write<span class="sr-only">(current)</span></a></li>
+        <li><a href="{% url 'boards:boardpage' board.id 1 %}">Go back to board</a></li>
+
+        <form action="" method="POST">{% csrf_token %}
+          <li><input class="form-control" type="text" name="search_post" placeholder="Search Post"></li>
+          <select class="form-control" name="select_post">
+            <option selected="subname">subject</option>
+            <option>content</option>
+            <option>subject + content</option>
+            <option>writer</option>
+          </select>
+          </form>
+
         {% if has_previous %}
-          <li><a href="{% url 'boards:boardpage' board_id previous_page %}">Prev</a></li>
+          <li><a href="{% url 'boards:boardpage' board.id previous_page %}">Prev</a></li>
         {% endif %}
     
         {% if has_next %}
-          <li><a href="{% url 'boards:boardpage' board_id nextpage %}">Next</a></li>
+          <li><a href="{% url 'boards:boardpage' board.id nextpage %}">Next</a></li>
         {% endif %}
       </ul>
     </div>
@@ -21,7 +33,11 @@
     <div class="container-fluid">
       <div class="row">
        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-         <h1 class="page-header">{{ board.boardname }}</h1>
+         <h1 class="page-header">{{ board.boardname }}
+           {% if top50 and searchvalue %}
+             {{ top50 }} : "{{searchvalue}}" 
+           {% endif %}
+         </h1>
 
           <div class="table-responsive">
             <table class="table table-striped">
@@ -43,7 +59,7 @@
                          <div type="button" class="btn btn-default btn-xs">Notice</div>
                        {% endif %}
                      </td>
-                     <td width="65%"><a href="{% url 'boards:postpage' board_id post.id %}">{{ post.subject }}</a>
+                     <td width="65%"><a href="{% url 'boards:postpage' board.id post.id %}">{{ post.subject }}</a>
                        {% if post|num_of_comments_in_post %}
                          &nbsp;<font color="brown">{{ post|num_of_comments_in_post }}</font>
                        {% endif %}

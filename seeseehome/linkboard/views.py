@@ -84,19 +84,18 @@ def linkboardpage(request, page=1):
     posts = LinkPost.objects.all().order_by('-date_posted')
 
     if request.method == "POST":
-        if 'search_description' in request.POST:
-            search_decription = request.POST['search_description']
-            posts = posts.filter(description__icontains = search_decription)
-            posts = posts[0:50]
-            boardlist = Board.objects.all()
-            return render(request, "linkboard/linkboardpage.html",
-                       {
-                           'posts' : posts,
-                           'boardlist' : boardlist,
-                           'searchvalue' : search_decription,
-                           'top50' : "Top 50 Search",
-                       }
-                   )
+        search_decription = request.POST['search_description']
+        posts = posts.filter(description__icontains = search_decription)
+        posts = posts[0:50]
+        boardlist = Board.objects.all()
+        return render(request, "linkboard/linkboardpage.html",
+                   {
+                       'posts' : posts,
+                       'boardlist' : boardlist,
+                       'searchvalue' : search_decription,
+                       'top50' : "Top 50 Search",
+                   }
+               )
 
 #   if the page does not exist, raise 404
     try:

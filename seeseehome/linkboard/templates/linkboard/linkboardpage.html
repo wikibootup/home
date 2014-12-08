@@ -8,10 +8,11 @@
       </ul>
       <ul class="nav nav-sidebar">
         <li class="active"><a href="{% url 'linkboard:linkpost' %}">Link Post<span class="sr-only">(current)</span></a></li>
+        <li><a href="">Go back to board</a><span class="sr-only">(current)</span></li>
+ 
         {% if has_previous %}
           <li><a href="{% url 'linkboard:linkboardpage' previous_page %}">Prev</a></li>
         {% endif %}
-        <li><a href="">Go to board</a><span class="sr-only">(current)</span></li>
     
         {% if has_next %}
           <li><a href="{% url 'linkboard:linkboardpage' nextpage %}">Next</a></li>
