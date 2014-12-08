@@ -34,7 +34,9 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th width="70%">Description</th>
+                  <th width="60%">Description</th>
+                  <th width="5%"></th>
+                  <th width="5%"></th>
                   <th width="10%">Writer</th>
                   <th width="20%">Date posted</th>
                 </tr>
@@ -44,7 +46,17 @@
                 {% if posts %}
                  {% for post in posts %}
                    <tr>
-                     <td width="70%"><a href="{{post.url}}" target="_blank">{{ post.description }}</a></td>
+                     <td width="60%"><a href="{{post.url}}" target="_blank">{{ post.description }}</a></td>
+                       {% if post.writer == user %}
+                         <p>
+                         <th width="5%">
+                           <button type="button" class="btn btn-default btn-xs"><a href="{% url 'linkboard:updatelinkpost' post.id %}">Rewrite</a></button>
+                         </th>
+                         <th width="5%">
+                           <button type="button" class="btn btn-danger btn-xs"><a href="{% url 'linkboard:deletelinkpost' post.id %}">Delete</a></button>
+                         </th>
+                       </p>
+                       {% endif %}
                      <td width="10%">{{ post.writer.username }}</td>
                      <td width="20%">{{ post.date_posted }} </td>
                    </tr>
