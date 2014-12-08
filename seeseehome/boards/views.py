@@ -71,7 +71,7 @@ def write(request, board_id, **extra_fields):
         if not 'post_id' in extra_fields:
             post = Post.objects.create_post(board=board, subject=subject, 
                     writer=writer, is_notice=is_notice)
-#       content save
+#           content save
             if is_valid_content:
                 Post.objects.update_post(post.id, content=content)
 
@@ -217,10 +217,23 @@ def deletecomment(request, board_id, post_id, comment_id):
     comment = Comment.objects.get_comment(comment_id)
     if request.user != comment.writer:
         messages.error(request, msg.boards_delete_comment_error)
-        messages.info(request, msg.boards_delete_auth_error)
+        messages.info(request, msg.boards_delete_comment_auth_error)
     else:
         comment.delete()
 
     return HttpResponseRedirect(reverse("boards:postpage", 
       args=(board_id, post_id)))
- 
+
+@login_required
+def deletepost(request, board_id, post_id):
+    post = Post.objects.get_post(post_id)
+    
+    if request.user != post.writer:
+        messages.error(request, msg.boards_delete_post_error)
+        messages.info(request, msg.boards_delete_post_auth_error)
+    else:
+        post.delete()
+    
+    return HttpResponseRedirect(reverse("boards:boardpage", 
+      args=(board_id, 1)))
+
