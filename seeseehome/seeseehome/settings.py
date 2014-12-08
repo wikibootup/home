@@ -29,12 +29,12 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 SECRET_KEY = 't6g+nq2ba%na%(fxbm%ino##c@4+pn&+68j5spm+!nu2e)*6^b'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
-#ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '220.149.86.220', 'seebuntu']
 #ALLOWED_HOSTS = ['*']
 
 # Application definition
