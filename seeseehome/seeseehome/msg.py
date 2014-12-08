@@ -135,12 +135,19 @@ linkboard_anonymous_user_read = \
     "Only logged-in user can access this board and read posts"
 
 ### linkpost
+linkboard_linkpost_success = "SUCCESS : Link Post"
 linkboard_linkpost_error = "ERROR : Link Post"
 linkboard_linkpost_invalid = "The URL is invalid"
 linkboard_linkpost_unicode_error = "The URL has invalid domain part"
 
 ### delete comment
 boards_delete_comment_error = "ERROR : Delete Comment"
-boards_delete_auth_error = "You don't have permission to delete this comment"
+boards_delete_comment_auth_error = \
+    "You don't have permission to delete this comment"
+
+boards_delete_post_error = "ERROR : Delete Post"
+boards_delete_post_auth_error = \
+    "You don't have permission to delete this post"
+
 
 
