@@ -21,7 +21,6 @@
          </h1>
          <h3 class="page-header" align="right">{{ post.writer.username }}</h3>
 
-
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
@@ -41,11 +40,10 @@
                </tbody>
              </table>
 
-
     {% if post.writer == user %}
       <p>
-        <a href="{% url 'boards:rewrite' board.id post.id %}"><button type="button" class="btn btn-primary">Rewrite</button></a>
-        <a href=""><button type="button" class="btn btn-danger">Delete</button></a>
+        <button type="button" class="btn btn-default"><a href="{% url 'boards:rewrite' board.id post.id %}">Rewrite</a></button>&nbsp;
+        <button type="button" class="btn btn-danger"><a href="{% url 'boards:deletepost' board.id post.id %}">Delete</a></button>
       </p>
     {% endif %}
 
