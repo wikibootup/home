@@ -37,6 +37,7 @@ users_name_at_most_30 = "User name length is limited to 30.\n"
 users_invalid_name = "User name should be Korean Character (or Alphabet)\n" +\
                     "And it cannot contain special characters " + \
                     "except for under bar_ , hyphen -"
+users_username_does_not_exist = "Searched user name does not exist."
 
 ### contact number
 users_invalid_contact_number = "Invalid contact number"
@@ -120,12 +121,15 @@ boards_read_error_info = \
 oards_reader_perm_error = \
     "You cannot access this board and read posts( pemission )"
 
+### search post
+boards_search_post_error = "ERROR : Search specific posts"
+
 ### comment
-board_comment_error = "ERROR : Comment Error"
-board_comment_must_be_set = "Comment must be set"
-board_comment_at_most_255 = "Comment max length : 255"
-board_comment_post_does_not_exist = "The Post does not exist"
-board_comment_board_does_not_exist = "The Board does not exist"
+boards_comment_error = "ERROR : Comment Error"
+boards_comment_must_be_set = "Comment must be set"
+boards_comment_at_most_255 = "Comment max length : 255"
+boards_comment_post_does_not_exist = "The Post does not exist"
+boards_comment_board_does_not_exist = "The Board does not exist"
 
 #### linkboard
 linkboard_linkpost_invalid_writer_perm = \
