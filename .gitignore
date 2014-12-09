@@ -23,3 +23,6 @@ bin/
 # Database
 db.sqlite3
 .DS_store
+
+# Security information file
+security_information.py

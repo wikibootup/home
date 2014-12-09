@@ -1,9 +1,16 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
+# Caution : Never upload sercurity_information file anywhere 
+try:
+  from seeseehome import security_information
+  ADMIN_URL = security_information.ADMIN_URL
+except:
+  ADMIN_URL = "admin_for_insecure_because_not_set_secret_admin_url"
+
 urlpatterns = patterns('',
 #   admin page
-    url(r'^admin/', include(admin.site.urls), name="admin"),
+    url(r'^' + ADMIN_URL + '/', include(admin.site.urls), name="admin"),
 
 #   main page
     url(r'^$', 'seeseehome.views.home', name='home'),
