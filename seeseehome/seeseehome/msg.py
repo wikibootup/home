@@ -83,7 +83,7 @@ users_logout_success = "SUCCESS : Logout"
 users_logout_error_info = \
     "Logout failed. It seems you accessd the URL without Logged in"
 users_logout_success_info = "Successfully Logout"
-
+users_already_logged_in = "You are logging-in already"
 
 #### board
 ### create board
