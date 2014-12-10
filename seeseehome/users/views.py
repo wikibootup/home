@@ -273,6 +273,7 @@ def editpassword(request):
 
 #       set new password            
         request.user.set_password(new_password)
+        request.user.save()
         _logout(request)
         messages.success(request, msg.users_change_pwd_success)
         messages.info(request, msg.users_change_pwd_success_info)
