@@ -27,7 +27,13 @@ def authenticate(username=None, password=None):
         return user
 
 def login(request):
-#   username
+#	If is the user already logged in?
+
+    if request.user.is_authenticated():
+        messages.error(request, msg.users_login_error)
+        messages.info(request, msg.users_already_logged_in)
+        return HttpResponseRedirect(reverse("home"))
+
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['pwd']
@@ -267,6 +273,7 @@ def editpassword(request):
 
 #       set new password            
         request.user.set_password(new_password)
+        request.user.save()
         _logout(request)
         messages.success(request, msg.users_change_pwd_success)
         messages.info(request, msg.users_change_pwd_success_info)
