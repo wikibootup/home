@@ -225,7 +225,7 @@ def boardpage(request, board_id, page=1):
     All posts are listed in order by posted date.
     But First of all, notice post will be listed.
     """
-    posts = posts.order_by("-is_notice")
+    posts = posts.order_by("-is_notice", "-date_posted")
 #   if page does not exist, then raise 404
     try:    
         custom_paginator = pagination(posts=posts, posts_per_page = 10,

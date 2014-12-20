@@ -136,7 +136,6 @@ def updatelinkpost(request, post_id):
 @login_required
 def deletelinkpost(request, post_id):
     linkpost = LinkPost.objects.get_linkpost(post_id)
-    print linkpost.writer
     if request.user != linkpost.writer:
         messages.error(request, msg.boards_delete_post_error)
         messages.info(request, msg.boards_delete_post_auth_error)
